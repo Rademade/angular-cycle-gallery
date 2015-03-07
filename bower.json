@@ -1,0 +1,9 @@
+{
+  "name": "angular-multi-gallery",
+  "version": "0.0.1",
+  "main": "dist/angular-multi-gallery.js",
+  "dependencies": {
+    "angular": "~1.2.12",
+    "angular-swipe": "git@github.com:marmorkuchen-net/angular-swipe.git"
+  }
+}

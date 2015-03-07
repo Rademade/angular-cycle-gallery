@@ -1,0 +1,17 @@
+html(ng-app="app")
+    head
+        title Angular Multi Gallery
+        meta(charset="utf8")
+        <!-- inject:css -->
+        <!-- endinject -->
+    body(ng-controller="AppController")
+        h1 Gallery example
+        div.gallery-wrapper(gallery)
+            div.gallery-slider
+                div.gallery-item(gallery-repeater="gallery_item in gallery")
+                    div.gallery-item-content() {{gallery_item.text}}
+            button.gallery-button-next(gallery-button="next") next
+            button.gallery-button-prev(gallery-button="prev") prev
+        button(ng-click="add()") Add
+        <!-- inject:js -->
+        <!-- endinject -->
