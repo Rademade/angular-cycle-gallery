@@ -21,7 +21,6 @@ angular.module('multiGallery').service 'GalleryService', [
       @items = items
       @_createCycleItems()
       @_fixIndex()
-
       GalleryEvents.do('update')
 
     getNearestRange: () ->

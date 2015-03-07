@@ -1,12 +1,12 @@
 angular.module('multiGallery').service 'GalleryDirective', [
-  'GalleryService', '$animate',
-  (GalleryService, $animate) ->
+  'GalleryService', 'RenderedItems', '$animate',
+  (GalleryService, RenderedItems, $animate) ->
 
     class GalleryDirective
 
-      _renderedItems: []
+      _renderedItems: new RenderedItems()
 
-      _transcludeFunction = null
+      _transcludeFunction: null
 
       _$scope: null
       _scopeItemName: null
@@ -16,6 +16,7 @@ angular.module('multiGallery').service 'GalleryDirective', [
       #
       # Public methods
       #
+
       constructor: ($scope, scopeItemName, $holder, transcludeFunction)->
         @_$scope = $scope
         @_scopeItemName = scopeItemName
@@ -38,49 +39,30 @@ angular.module('multiGallery').service 'GalleryDirective', [
         @_$holder.css('left', @_itemWidth * GalleryService.NEAREST_ITEMS * -1)
 
       _renderElements: ->
-        @_removeRenderFlags()
+        @_renderedItems.markAllOutdated()
+        prev_item = null
         for item in GalleryService.getNearestRange()
-          continue if @_flagRenderedElements(item)
-          @_appendItem(item)
-        @_removeOutdatedElements()
+          @_addItemToHolder(prev_item, item) unless @_renderedItems.isRendered(item, true)
+          prev_item = item
+        @_renderedItems.removeOutdated()
 
-      _appendItem: (item)->
+      _addItemToHolder: (prev_item, item)->
         $itemScope = @_newItemScope(item)
         @_transcludeFunction $itemScope, (element) =>
-          $animate.enter element, @_$holder
-          @_storeRenderElementData $itemScope, element, item
+          @_appendElement(@_renderedItems.findElement(prev_item), element, item)
+          @_renderedItems.add($itemScope, element, item)
           @_collectElementStyleProperties element
+
+      _appendElement: ($prev_element = null, $element, item)->
+        if $prev_element == null
+          @_$holder.prepend($element)
+        else
+          $prev_element.after($element)
 
       _newItemScope: (item)->
         $itemScope = @_$scope.$new()
         $itemScope[@_scopeItemName] = item
         return $itemScope
-
-      _storeRenderElementData: ($scope, element, item) ->
-        data = scope: $scope, element: element, itemData: item, renderUpdate: true
-        @_renderedItems.push( data )
-
-      _removeRenderFlags: =>
-        for renderedItem in @_renderedItems
-          renderedItem.renderUpdate = false
-
-      _flagRenderedElements: (item)->
-        for renderedItem in @_renderedItems
-          if renderedItem.itemData == item
-            renderedItem.renderUpdate = true
-            return true
-        return false
-
-      _removeOutdatedElements: ->
-        index_for_removeing = []
-        for renderedItem, i in @_renderedItems
-          unless renderedItem.renderUpdate
-            index_for_removeing.push i
-            renderedItem.element.remove()
-            renderedItem.scope.$destroy()
-
-        for index in index_for_removeing
-          @_renderedItems.splice(index, index+1)
 
       _collectElementStyleProperties: (element)->
         @_itemWidth ||= element[0].offsetHeight

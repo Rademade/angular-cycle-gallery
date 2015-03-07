@@ -17,9 +17,9 @@ app.controller 'AppController', ['$scope', ($scope) ->
     {text: 'Item 10'}
   ]
 
-  $scope.app = ->
+  $scope.add = ->
     ++i
-    $scope.gallery.push text: "Item #{i}}"
+    $scope.gallery.push text: "Item #{i}"
 
   window.s = $scope
 
