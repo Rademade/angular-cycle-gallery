@@ -71,8 +71,10 @@ angular.module('multiGallery').service 'ItemsStorage', ->
       @prevBuffer = 0
 
     _fixIndex: ->
-      @index = 0 if @index > @counter
-      @index = @counter if @index < 0
+      fixed = false
+      @index = @index - @counter if @index > @counter
+      @index = @count + @index if @index < 0
+      @_fixIndex() unless 0 <= @index <= @counter
 
     _createCycleItems: ->
       @cycleItems = []

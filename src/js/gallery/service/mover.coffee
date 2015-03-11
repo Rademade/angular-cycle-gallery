@@ -74,7 +74,6 @@ angular.module('multiGallery').service 'GalleryMover', ->
       })
 
     _onAnimationComplete: ->
-      console.log('Animation complete')
       @_storage.clearRangeBuffer()
       @_syncCurrentIndex()
       @_rerender()
