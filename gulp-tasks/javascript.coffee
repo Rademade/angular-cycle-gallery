@@ -37,8 +37,7 @@ gulp.task 'javascript:build', ['javascript'], ->
   js_directory = file_manager.build
 
   stream = collectJavaScript([
-    "#{file_manager.public}/vendor.js"
-    "#{file_manager.public}/application.js"
+    "#{file_manager.public}/library.js"
   ], js_filename, js_directory, {coffee: no, compress: yes})
 
   stream.on 'end', -> deferred.resolve()
