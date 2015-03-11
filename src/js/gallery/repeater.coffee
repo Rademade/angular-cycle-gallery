@@ -1,6 +1,6 @@
 angular.module('multiGallery').directive 'galleryRepeater', [
-  'GalleryRenderer', 'ItemsStorage', 'GalleryMover', 'GalleryEvents',
-  (GalleryRenderer, ItemsStorage, GalleryMover, GalleryEvents)->
+  'GalleryRenderer', 'ItemsStorage', 'GalleryMover', 'GalleryEvents', '$rootScope'
+  (GalleryRenderer, ItemsStorage, GalleryMover, GalleryEvents, $rootScope)->
 
     terminal: true
     transclude : 'element'
@@ -38,7 +38,7 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       $scope.$watchCollection _collectionName, (items)-> mover.render(items)
 
       # Methods
-
-      $scope.setGalleryIndex = (index)-> mover.setIndex( index )
+      # todo make custom method
+      $rootScope.setGalleryIndex = (index)-> mover.setIndex( index )
 
 ]

@@ -54,12 +54,14 @@ angular.module('multiGallery').service 'GalleryRenderer', [
       _addItemToHolder: (prev_item, item)->
         $itemScope = @_newItemScope(item)
         @_transcludeFunction $itemScope, (element) =>
-          @_appendElement(@_renderedItems.findElementByData(prev_item), element, item)
+          prev_element = @_renderedItems.findElementByData(prev_item)
+          console.log(prev_element)
+          @_appendElement(prev_element, element, item)
           @_renderedItems.add($itemScope, element, item)
 
       _appendElement: ($prev_element = null, $element, item)->
         if $prev_element == null
-          @_$holder.prepend($element)
+          @_$holder.prepend($element) # to the start
         else
           $prev_element.after($element)
 

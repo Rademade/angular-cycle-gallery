@@ -71,7 +71,7 @@ angular.module('multiGallery').service 'ItemsStorage', [
         @nextBuffer = 0
 
       _clearPrevBuffer: ->
-        @setIndex(@index - @nextBuffer)
+        @setIndex(@index - @prevBuffer)
         @prevBuffer = 0
 
       setIndex: (index)->
