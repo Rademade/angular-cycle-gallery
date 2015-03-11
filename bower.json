@@ -6,6 +6,6 @@
     "angular": "~1.2.12",
     "angular-swipe": "git@github.com:marmorkuchen-net/angular-swipe.git",
     "gsap": "~1.16.0",
-    "uuid4": "~1.0.0"
+    "angular-uuid4": "~0.3.0"
   }
 }
