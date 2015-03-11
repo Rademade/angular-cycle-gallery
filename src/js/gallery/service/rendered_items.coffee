@@ -14,7 +14,7 @@ angular.module('multiGallery').service 'RenderedItems', ->
 
     isRendered: (data, removeOutdated = false)->
       for item in @_items
-        if item.data == data
+        if item.data._$UUID == data._$UUID
           item._$outedate = false if removeOutdated
           return true
       return false
@@ -38,7 +38,7 @@ angular.module('multiGallery').service 'RenderedItems', ->
     findElementByData: (data)->
       return null unless data
       for item in @_items
-        return item.element if item.data == data
+        return item.element if item.data._$UUID == data._$UUID
 
     firstElement: ->
       item = @_items[0]

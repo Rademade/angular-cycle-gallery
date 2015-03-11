@@ -18,9 +18,9 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
     # Public methods
 
-    constructor: (storage, gallery, $holder, $scope)->
+    constructor: (storage, renderer, $holder, $scope)->
       @_storage = storage
-      @_renderer = gallery
+      @_renderer = renderer
       @_$holder = $holder
       @_$scope = $scope
 
@@ -86,6 +86,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
       # Current display element
       $element = @_renderer.getElementByIndex(display_index)
+      console.log($element)
 
       # Render
       @_renderer.render( @_storage.getNearestRange() )

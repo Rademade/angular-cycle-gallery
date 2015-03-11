@@ -1,1 +1,1 @@
-angular.module('multiGallery', ['swipe'])
+angular.module('multiGallery', ['swipe', 'uuid4'])
