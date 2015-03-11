@@ -16,6 +16,7 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       _matchResult = _repeatAttributes.match(/^\s*(.+)\s+in\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/)
       _scopeItemName = _matchResult[1]
       _collectionName = _matchResult[2]
+      _galleryIndexName = '$galleryIndex'
       _$holder = $element.parent()
 
       # Classes
@@ -32,7 +33,12 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       GalleryEvents.on 'move:prev', -> mover.prev()
       GalleryEvents.on 'animate:next', -> mover.animateNext()
       GalleryEvents.on 'animate:prev', -> mover.animatePrev()
+      GalleryEvents.on 'index:update', -> $scope[_galleryIndexName] = storage.getIndex()
 
       $scope.$watchCollection _collectionName, (items)-> mover.render(items)
+
+      # Methods
+
+      $scope.setGalleryIndex = (index)-> mover.setIndex( index )
 
 ]

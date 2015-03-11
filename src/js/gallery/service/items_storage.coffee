@@ -1,6 +1,6 @@
 angular.module('multiGallery').service 'ItemsStorage', [
-  'CycleGenerator'
-  (CycleGenerator)->
+  'CycleGenerator', 'GalleryEvents'
+  (CycleGenerator, GalleryEvents)->
 
     class ItemsStorage
 
@@ -22,22 +22,23 @@ angular.module('multiGallery').service 'ItemsStorage', [
       setItems: (items) ->
         @count = items.length
         @counter = @count - 1
-        # todo. Maybe some of them already exist in current class
         @items = items
         @nextCycleItems.setItems(@items)
         @prevCycleItems.setItems(@items)
-        @_fixIndex()
+        @setIndex(0)
 
       getNearestRange: () ->
         return [] if @count == 0
         [].concat(@getPrevRangeItems(), @getNextRangeItems())
+
+      getIndex: ->
+        @index
 
       getPrevRangeItems: ->
         items_count = @NEAREST_ITEMS + @prevBuffer
         cycle_multiplier = (((items_count + @index) / @count) | 0) + 1
         from_index = @count * cycle_multiplier - items_count + @index
         to_index = from_index + items_count
-        console.log(from_index, to_index)
         @prevCycleItems.sliceItems(from_index, to_index)
 
       getNextRangeItems: ->
@@ -47,12 +48,10 @@ angular.module('multiGallery').service 'ItemsStorage', [
         @nextCycleItems.sliceItems(from_index, to_index)
 
       nextIndex: ->
-        ++@index
-        @_fixIndex()
+        @setIndex(@index+1)
 
       prevIndex: ->
-        --@index
-        @_fixIndex()
+        @setIndex(@index-1)
 
       getCurrentIndexInRange: ->
         @NEAREST_ITEMS - @prevBuffer + @nextBuffer
@@ -60,7 +59,6 @@ angular.module('multiGallery').service 'ItemsStorage', [
       clearRangeBuffer: ->
         @_clearNextBuffer()
         @_clearPrevBuffer()
-        @_fixIndex()
 
       incNextBuffer: -> ++@nextBuffer
       getNextBuffer: -> @nextBuffer
@@ -69,17 +67,23 @@ angular.module('multiGallery').service 'ItemsStorage', [
       getPrevBuffer: -> @prevBuffer
 
       _clearNextBuffer: ->
-        @index += @nextBuffer
+        @setIndex(@index + @nextBuffer)
         @nextBuffer = 0
 
       _clearPrevBuffer: ->
-        @index -= @prevBuffer
+        @setIndex(@index - @nextBuffer)
         @prevBuffer = 0
 
-      _fixIndex: ->
-        fixed = false
-        @index = @index - @count if @index > @counter
-        @index = @count + @index if @index < 0
-        @_fixIndex() unless 0 <= @index <= @counter
+      setIndex: (index)->
+        fixed_index = @_fixIndex(index)
+        unless @index == fixed_index
+          @index = fixed_index
+          GalleryEvents.do('index:update')
+
+      _fixIndex: (index)->
+        index = index%@count if index > @counter
+        index = @count + index if index < 0
+        index = @_fixIndex(index) unless 0 <= index <= @counter
+        index
 
 ]

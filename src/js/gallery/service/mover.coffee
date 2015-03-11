@@ -31,6 +31,11 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_syncCurrentIndex()
       @_applyCurrentIndexPosition()
 
+    setIndex: (index)->
+      @_storage.setIndex(index)
+      @_syncCurrentIndex()
+      @_rerender()
+
     next: ->
       @_storage.nextIndex()
       @_syncCurrentIndex()
@@ -86,7 +91,6 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
       # Current display element
       $element = @_renderer.getElementByIndex(display_index)
-      console.log($element)
 
       # Render
       @_renderer.render( @_storage.getNearestRange() )
@@ -152,5 +156,4 @@ angular.module('multiGallery').service 'GalleryMover', ->
     _rerender: ->
       @_renderer.render( @_storage.getNearestRange() )
       @_applyCurrentIndexPosition()
-      @_$scope.$apply()
-
+      @_$scope.$apply() unless @_$scope.$$phase
