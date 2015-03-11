@@ -8,7 +8,6 @@ angular.module('multiGallery').service 'ItemsStorage', [
 
       items: []
       index: 0
-      counter: 0
       count: 0
 
       nextBuffer: 0
@@ -21,7 +20,6 @@ angular.module('multiGallery').service 'ItemsStorage', [
 
       setItems: (items) ->
         @count = items.length
-        @counter = @count - 1
         @items = items
         @nextCycleItems.setItems(@items)
         @prevCycleItems.setItems(@items)
@@ -81,9 +79,9 @@ angular.module('multiGallery').service 'ItemsStorage', [
           GalleryEvents.do('index:update')
 
       _fixIndex: (index)->
-        index = index%@count if index > @counter
+        index = index%@count if index >= @count and @count > 0
         index = @count + index if index < 0
-        index = @_fixIndex(index) unless 0 <= index <= @counter
+        index = @_fixIndex(index) unless 0 <= index < @count or @count == 0
         index
 
 ]
