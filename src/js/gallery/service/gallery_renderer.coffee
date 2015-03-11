@@ -1,9 +1,10 @@
-angular.module('multiGallery').service 'GalleryDirective', [
-  'GalleryService', 'RenderedItems', '$animate',
-  (GalleryService, RenderedItems, $animate) ->
+angular.module('multiGallery').service 'GalleryRenderer', [
+  'RenderedItems'
+  (RenderedItems) ->
 
-    class GalleryDirective
+    class GalleryRenderer
 
+      # GalleryMover
       _renderedItems: new RenderedItems()
 
       _transcludeFunction: null
@@ -11,7 +12,6 @@ angular.module('multiGallery').service 'GalleryDirective', [
       _$scope: null
       _scopeItemName: null
       _$holder: null
-      _itemWidth: null
 
       #
       # Public methods
@@ -23,35 +23,39 @@ angular.module('multiGallery').service 'GalleryDirective', [
         @_$holder = $holder
         @_transcludeFunction = transcludeFunction
 
-      setItems: (items)->
-        GalleryService.setItems(items)
+      render: (items)->
+        # todo problem with rendering same element's in cycle. Hard to repeat them
+        @_renderedItems.markAllOutdated()
+        @_updateHolder(items)
+        @_renderedItems.removeOutdated()
 
-      update: ->
-        @_renderElements()
-        @_updatePosition()
+      firstElement: ->
+        @_renderedItems.firstElement()
+
+      getElementByIndex: (index)->
+        @_$holder.children().eq(index)[0]
+
+      getElementIndex: (element)->
+        i = 0
+        while ((element = element.previousSibling) != null)
+          ++i
+        return i
 
       #
       # Private methods
       #
 
-      _updatePosition: ->
-        #todo add animations
-        @_$holder.css('left', @_itemWidth * GalleryService.NEAREST_ITEMS * -1)
-
-      _renderElements: ->
-        @_renderedItems.markAllOutdated()
+      _updateHolder: (items)->
         prev_item = null
-        for item in GalleryService.getNearestRange()
+        for item in items
           @_addItemToHolder(prev_item, item) unless @_renderedItems.isRendered(item, true)
           prev_item = item
-        @_renderedItems.removeOutdated()
 
       _addItemToHolder: (prev_item, item)->
         $itemScope = @_newItemScope(item)
         @_transcludeFunction $itemScope, (element) =>
-          @_appendElement(@_renderedItems.findElement(prev_item), element, item)
+          @_appendElement(@_renderedItems.findElementByData(prev_item), element, item)
           @_renderedItems.add($itemScope, element, item)
-          @_collectElementStyleProperties element
 
       _appendElement: ($prev_element = null, $element, item)->
         if $prev_element == null
@@ -63,8 +67,5 @@ angular.module('multiGallery').service 'GalleryDirective', [
         $itemScope = @_$scope.$new()
         $itemScope[@_scopeItemName] = item
         return $itemScope
-
-      _collectElementStyleProperties: (element)->
-        @_itemWidth ||= element[0].offsetHeight
 
 ]

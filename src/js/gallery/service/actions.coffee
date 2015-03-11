@@ -1,8 +1,11 @@
 angular.module('multiGallery').service 'GalleryActions', [
-  'GalleryService'
-  (GalleryService)->
+  'GalleryEvents'
+  (GalleryEvents)->
 
-    next: -> GalleryService.nextItem()
-    prev: -> GalleryService.prevItem()
+    next: -> GalleryEvents.do('move:next')
+    prev: -> GalleryEvents.do('move:prev')
+
+    animateNext: -> GalleryEvents.do('animate:next')
+    animatePrev: -> GalleryEvents.do('animate:prev')
 
 ]

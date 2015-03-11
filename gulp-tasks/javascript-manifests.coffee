@@ -8,6 +8,7 @@ module.exports = (->
     file_manager.rootify [
       'angular/angular'
       'angular-swipe/dist/angular-swipe'
+      'gsap/src/uncompressed/TweenMax'
     ], "bower_components", 'js'
 
   manifests.library = ->

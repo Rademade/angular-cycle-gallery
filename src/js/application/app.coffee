@@ -2,24 +2,34 @@ app = angular.module('app', ['multiGallery'])
 
 app.controller 'AppController', ['$scope', ($scope) ->
 
-  i = 10
-
   $scope.gallery = [
-    {text: 'Item 1'},
-    {text: 'Item 2'},
-    {text: 'Item 3'},
-    {text: 'Item 4'},
-    {text: 'Item 5'},
-    {text: 'Item 6'},
-    {text: 'Item 7'},
-    {text: 'Item 8'},
-    {text: 'Item 9'},
-    {text: 'Item 10'}
+    {text: 'Item 1', color: 'red'}
+    {text: 'Item 2', color: 'blue'}
+    {text: 'Item 3', color: 'yellow'}
+    {text: 'Item 4', color: 'white'}
+    {text: 'Item 5', color: 'black'}
+    {text: 'Item 6', color: 'red'}
+    {text: 'Item 7', color: 'blue'}
+    {text: 'Item 8', color: 'yellow'}
+    {text: 'Item 9', color: 'white'}
+    {text: 'Item 10', color: 'black'}
+    {text: 'Item 11', color: 'red'}
+    {text: 'Item 12', color: 'blue'}
+    {text: 'Item 13', color: 'yellow'}
+    {text: 'Item 14', color: 'white'}
+    {text: 'Item 15', color: 'black'}
+    {text: 'Item 16', color: 'red'}
+    {text: 'Item 17', color: 'blue'}
+    {text: 'Item 18', color: 'yellow'}
+    {text: 'Item 19', color: 'white'}
+    {text: 'Item 20', color: 'black'}
+    {text: 'Item 21', color: 'white'}
   ]
 
   $scope.add = ->
-    ++i
-    $scope.gallery.push text: "Item #{i}"
+    count = $scope.gallery.length
+    $scope.gallery.push text: "Item #{count}"
+
 
   window.s = $scope
 

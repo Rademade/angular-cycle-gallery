@@ -4,6 +4,7 @@ concat            = require 'gulp-concat'
 uglify            = require 'gulp-uglify'
 manifests         = require './javascript-manifests.coffee'
 coffee            = require 'gulp-coffee'
+plumber           = require 'gulp-plumber'
 Q                 = require 'q'
 
 ###
@@ -51,6 +52,7 @@ gulp.task 'javascript:build', ['javascript'], ->
 
 collectJavaScript = (source, name, destination, opts = {}) ->
   stream = gulp.src source
+  stream = stream.pipe plumber()
 
   stream = stream.pipe coffee(bare: no) if opts.coffee
   stream = stream.pipe uglify() if opts.compress

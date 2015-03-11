@@ -1,25 +1,38 @@
 angular.module('multiGallery').directive 'galleryRepeater', [
-  'GalleryDirective', 'GalleryEvents',
-  (GalleryDirective, GalleryEvents)->
+  'GalleryRenderer', 'ItemsStorage', 'GalleryMover', 'GalleryEvents',
+  (GalleryRenderer, ItemsStorage, GalleryMover, GalleryEvents)->
 
     terminal: true
     transclude : 'element'
     terminal : true
     $$tlb : true
+    priority: 1000
 
-    link: ($scope, $element, $attr, nullController, transclude) ->
+    link: ($scope, $element, $attr, nullController, renderFunction) ->
+
+      # Attributes
 
       _repeatAttributes = $attr.galleryRepeater
       _matchResult = _repeatAttributes.match(/^\s*(.+)\s+in\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/)
       _scopeItemName = _matchResult[1]
       _collectionName = _matchResult[2]
+      _$holder = $element.parent()
 
-      gallery = new GalleryDirective($scope, _scopeItemName, $element.parent(), transclude)
+      # Classes
 
-      GalleryEvents.on 'update', ->
-        gallery.update()
-        $scope.$apply() unless $scope.$$phase
+      storage = new ItemsStorage()
+      gallery = new GalleryRenderer($scope, _scopeItemName, _$holder, renderFunction)
+      mover = new GalleryMover(storage, gallery, _$holder, $scope)
 
-      $scope.$watchCollection _collectionName, (items)-> gallery.setItems(items)
+      # todo update with in resize
+
+      # Events
+
+      GalleryEvents.on 'move:next', -> mover.next()
+      GalleryEvents.on 'move:prev', -> mover.prev()
+      GalleryEvents.on 'animate:next', -> mover.animateNext()
+      GalleryEvents.on 'animate:prev', -> mover.animatePrev()
+
+      $scope.$watchCollection _collectionName, (items)-> mover.render(items)
 
 ]

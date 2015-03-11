@@ -3,6 +3,7 @@ gulp              = require 'gulp'
 compass           = require 'gulp-compass'
 concat            = require 'gulp-concat'
 minifyCSS         = require 'gulp-minify-css'
+plumber           = require 'gulp-plumber'
 Q                 = require 'q'
 
 
@@ -38,6 +39,5 @@ compileStylesheets = (build_directory, name, opts = {}) ->
   stream = stream.pipe gulp.dest(build_directory)
 
   stream.on 'end', -> file_manager.removeFile("#{build_directory}/#{file_name}.css", deferred)
-  stream.on 'error', (e) -> console.log e
 
   deferred.promise

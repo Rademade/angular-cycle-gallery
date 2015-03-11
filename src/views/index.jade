@@ -8,10 +8,14 @@ html(ng-app="app")
         h1 Gallery example
         div.gallery-wrapper(gallery)
             div.gallery-slider
-                div.gallery-item(gallery-repeater="gallery_item in gallery")
-                    div.gallery-item-content() {{gallery_item.text}}
-            button.gallery-button-next(gallery-button="next") next
-            button.gallery-button-prev(gallery-button="prev") prev
+                div.gallery-item(gallery-repeater="item in gallery" ng-style="{'background-color':item.color}")
+                    div.gallery-item-content() {{item.text}}
+
+            button.action-button.next(gallery-button="next") next
+            button.action-button.prev(gallery-button="prev") prev
+            button.action-button.next.animate(gallery-button="animateNext") Animate next
+            button.action-button.prev.animate(gallery-button="animatePrev") Animate prev
+
         button(ng-click="add()") Add
         <!-- inject:js -->
         <!-- endinject -->
