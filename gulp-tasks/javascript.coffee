@@ -33,7 +33,7 @@ gulp.task 'javascript', [
 gulp.task 'javascript:build', ['javascript'], ->
   deferred = Q.defer()
 
-  js_filename = 'app.min.js'
+  js_filename = 'angular-cycle-gallery.min.js'
   js_directory = file_manager.build
 
   stream = collectJavaScript([
@@ -41,7 +41,7 @@ gulp.task 'javascript:build', ['javascript'], ->
     "#{file_manager.public}/application.js"
   ], js_filename, js_directory, {coffee: no, compress: yes})
 
-  stream.on 'end', -> file_manager.hashifyFile(js_directory, js_filename, deferred)
+  stream.on 'end', -> deferred.resolve()
   stream.on 'error', (e)-> console.log(e)
 
   deferred.promise
