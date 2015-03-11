@@ -48,23 +48,33 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_rerender()
 
     animateNext: ->
-      @_animation_type = @ANIMATION_SIDE_NEXT
+      return @_changeAnimationSide() if @_animation_side == @ANIMATION_SIDE_PREV
+      @_animation_side = @ANIMATION_SIDE_NEXT
       @_storage.incNextBuffer()
       @_animate()
 
     animatePrev: ->
-      @_animation_type = @ANIMATION_SIDE_PREV
+      return @_changeAnimationSide() if @_animation_side == @ANIMATION_SIDE_NEXT
+      @_animation_side = @ANIMATION_SIDE_PREV
       @_storage.incPrevBuffer()
       @_animate()
 
-
+  
     # Animation block
 
-    _defaultAnimationTime: -> @ANIMATION_TIME/1000
+    _defaultAnimationTime: ->
+      @ANIMATION_TIME/1000
 
     _stopPreviusAnimation: ->
       @_animation.pause() if @_animation
       @_animation.kill() if @_animation
+
+    _changeAnimationSide: ->
+      @_stopPreviusAnimation()
+      @_animation_side = null
+      @_storage.clearRangeBuffer()
+      @_syncMoveIndex()
+      @_rerender()
 
     _animate: (
       time = @_defaultAnimationTime()
@@ -76,45 +86,36 @@ angular.module('multiGallery').service 'GalleryMover', ->
         left: position + 'px'
         ease: Linear.easeNone
         onUpdate: => @_checkFrameChange()
-        onComplete: => @_onAnimationComplete()
+        onComplete: => @_onCompleteAnimation()
       })
 
-    _onAnimationComplete: ->
+    _onCompleteAnimation: ->
+      @_animation_side = null
       @_storage.clearRangeBuffer()
       @_syncMoveIndex()
       @_rerender()
 
     _checkFrameChange: (changeCallback)->
       return false if (display_index = @_getDisplayIndex()) == @_getMoveIndex()
-
-      # Stop animation
       @_stopPreviusAnimation()
 
-      # Current display element
-      $element = @_renderer.getElementByIndex(display_index)
+      # Positions
+      $current_element = @_renderer.getElementByIndex(display_index)
+      right_items_count = @_renderer.getRightElementsCount($current_element )
 
       # Render
-      @_renderer.render( @_storage.getNearestRange() )
-      @_$scope.$apply()
+      @_animationRender()
 
       # Change current index
-      if @_animation_type == @ANIMATION_SIDE_NEXT
+      if @_animation_side == @ANIMATION_SIDE_NEXT
         @_moveIndex++
-        position_diff = (@_currentHolderPosition() % @_itemWidth) + @_itemWidth
         moveToPosition = @_positionForMoveIndex()
       else
-        new_element_index = @_renderer.getElementIndex($element)
-
-        @_moveIndex += new_element_index - display_index
-        @_moveIndex--
-
-        position_diff = (@_currentHolderPosition() % @_itemWidth)
-        moveToPosition = @__calculateCenterPositionForIndex( @_storage.NEAREST_ITEMS )
+        @_moveIndex = @_renderer.getRenderedCount() - right_items_count
+        moveToPosition = @__calculatePositionForMoveIndex( @_storage.NEAREST_ITEMS )
 
       # Change position
-      @_setHolderPosition( @_positionForCurrentIndex() + position_diff )
-
-      # Animate
+      @_setHolderPosition( @_positionForCurrentIndex() + @_getPositionDiff() )
       @_animate(null, moveToPosition)
 
 
@@ -126,11 +127,16 @@ angular.module('multiGallery').service 'GalleryMover', ->
     _setHolderPosition: (position)->
       @_$holder.css 'left', position
 
+    _getPositionDiff: ->
+      position_diff = @_currentHolderPosition() % @_itemWidth
+      position_diff += @_itemWidth if @_animation_side == @ANIMATION_SIDE_NEXT
+      position_diff
+
     _applyCurrentIndexPosition: ->
       @_setHolderPosition( @_positionForCurrentIndex() )
 
     _positionForCurrentIndex: ->
-      @__calculateCenterPositionForIndex(@_getMoveIndex())
+      @__calculatePositionForMoveIndex(@_getMoveIndex())
 
     _getDisplayIndex: ->
       Math.abs( Math.round( @_currentHolderPosition() / @_itemWidth ) )
@@ -142,9 +148,9 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_moveIndex
 
     _positionForMoveIndex: ->
-      @__calculateCenterPositionForIndex(@_storage.getCurrentIndexInRange())
+      @__calculatePositionForMoveIndex(@_storage.getCurrentIndexInRange())
 
-    __calculateCenterPositionForIndex: (index)->
+    __calculatePositionForMoveIndex: (index)->
       @_itemWidth * index * -1
 
 
@@ -153,6 +159,11 @@ angular.module('multiGallery').service 'GalleryMover', ->
     _loadElementInfo: ->
       element = @_renderer.firstElement()
       @_itemWidth = element[0].offsetWidth if element #todo it's unposiable for different block size
+
+
+    _animationRender: ->
+      @_renderer.render( @_storage.getNearestRange() )
+      @_$scope.$apply()
 
     _rerender: ->
       @_renderer.render( @_storage.getNearestRange() )

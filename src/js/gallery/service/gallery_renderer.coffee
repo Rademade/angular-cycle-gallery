@@ -29,11 +29,17 @@ angular.module('multiGallery').service 'GalleryRenderer', [
         @_renderedItems.removeOutdated()
         @_updateHolder()
 
+      getRenderedCount: ->
+        @_renderedItems.getCount()
+
       firstElement: ->
         @_renderedItems.firstElement()
 
       getElementByIndex: (index)->
         @_$holder.children().eq(index)[0]
+
+      getRightElementsCount: ($element)->
+        @getRenderedCount() - @getElementIndex($element)
 
       getElementIndex: (element)->
         i = 0

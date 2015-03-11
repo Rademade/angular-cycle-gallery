@@ -14,6 +14,9 @@ angular.module('multiGallery').service 'RenderedItems', [
 
         @_items.push( new RenderedItem(index, data) )
 
+      getCount: ->
+        @_items.length
+
       getItemsForRender: ->
         items = []
         for item in @_items
@@ -32,8 +35,6 @@ angular.module('multiGallery').service 'RenderedItems', [
             index_for_removeing.unshift i # for reverse deleting
             item.destroy() # todo move to rendererer
 
-        console.log('Remove', index_for_removeing)
-
         for i in index_for_removeing
           @_items.splice(i, 1)
 
@@ -44,10 +45,5 @@ angular.module('multiGallery').service 'RenderedItems', [
       getElementByIndex: (index)->
         for item in @_items
           return item.getElement() if item.getIndex() == index
-
-#      _compare: (a, b)->
-#        return -1 if (a.getIndex() < b.getIndex())
-#        return 1 if (a.getIndex() > b.getIndex())
-#        return 0
 
 ]

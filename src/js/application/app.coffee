@@ -5,9 +5,9 @@ app.controller 'AppController', ['$scope', ($scope) ->
   $scope.gallery = [
     {text: 'Item 1', color: 'red'}
     {text: 'Item 2', color: 'blue'}
-#    {text: 'Item 3', color: 'green'}
-#    {text: 'Item 4', color: 'yellow'}
-#    {text: 'Item 5', color: 'black'}
+    {text: 'Item 3', color: 'green'}
+    {text: 'Item 4', color: 'yellow'}
+    {text: 'Item 5', color: 'black'}
 #    {text: 'Item 6', color: 'grey'}
 #    {text: 'Item 7', color: 'purple'}
 #    {text: 'Item 8', color: 'darkgreen'}
