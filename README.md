@@ -2,7 +2,7 @@
 
 ### Template example
 
-```
+```slim
   div.gallery-wrapper(gallery)
       div.gallery-slider
           div.gallery-item(gallery-repeater="item in gallery")
@@ -16,7 +16,7 @@
 
 ### Controller example
 
-```
+```coffee
 app = angular.module('app', ['multiGallery'])
 
 app.controller 'AppController', ['$scope', ($scope) ->
