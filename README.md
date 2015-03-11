@@ -28,6 +28,12 @@ app.controller 'AppController', ['$scope', ($scope) ->
     {text: 'Item 4'}
     {text: 'Item 5'}
   ]
+  
+  $scope.forceUpdate = ->
+    $scope.setGalleryIndex(2)
+
+  $scope.$watch '$galleryIndex', (index)->
+    console.log('Gallery item index changed', index)
 
 ]
 ```
