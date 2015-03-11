@@ -1,45 +1,53 @@
-angular.module('multiGallery').service 'RenderedItems', ->
+angular.module('multiGallery').service 'RenderedItems', [
+  'RenderedItem',
+  (RenderedItem)->
 
-  class RenderedItems
+    class RenderedItems
 
-    _items: [],
+      _items: [],
 
-    add: ($scope, element, data) ->
-      @_items.push(
-        scope: $scope
-        element: element
-        data: data
-        _$outedate: false
-      )
+      addItem: (index, data)->
+        for item in @_items
+          if item.isDataMatch(data)
+            item.updateRenderIndex(index)
+            return true
 
-    isRendered: (data, removeOutdated = false)->
-      for item in @_items
-        if item.data._$UUID == data._$UUID
-          item._$outedate = false if removeOutdated
-          return true
-      return false
+        @_items.push( new RenderedItem(index, data) )
 
-    markAllOutdated: ->
-      for item in @_items
-        item._$outedate = true
+      getItemsForRender: ->
+        items = []
+        for item in @_items
+          items.push(item) if item.isWaitingForRender()
+        items
 
-    removeOutdated: ->
-      index_for_removeing = []
+      markAllOutdated: ->
+        for item in @_items
+          item.markOutdated()
 
-      for item, i in @_items
-        if item._$outedate
-          index_for_removeing.unshift i # for reverse deleting
-          item.element.remove()
-          item.scope.$destroy()
+      removeOutdated: ->
+        index_for_removeing = []
 
-      for i in index_for_removeing
-        @_items.splice(i, 1)
+        for item, i in @_items
+          if item.isOutdate()
+            index_for_removeing.unshift i # for reverse deleting
+            item.destroy() # todo move to rendererer
 
-    findElementByData: (data)->
-      return null unless data
-      for item in @_items
-        return item.element if item.data._$UUID == data._$UUID
+        console.log('Remove', index_for_removeing)
 
-    firstElement: ->
-      item = @_items[0]
-      item.element[0] if item
+        for i in index_for_removeing
+          @_items.splice(i, 1)
+
+
+      firstElement: ->
+        @getElementByIndex(0)
+
+      getElementByIndex: (index)->
+        for item in @_items
+          return item.getElement() if item.getIndex() == index
+
+#      _compare: (a, b)->
+#        return -1 if (a.getIndex() < b.getIndex())
+#        return 1 if (a.getIndex() > b.getIndex())
+#        return 0
+
+]

@@ -37,8 +37,9 @@ angular.module('multiGallery').directive 'galleryRepeater', [
 
       $scope.$watchCollection _collectionName, (items)-> mover.render(items)
 
+
       # Methods
-      # todo make custom method
+
       $rootScope.setGalleryIndex = (index)-> mover.setIndex( index )
 
 ]

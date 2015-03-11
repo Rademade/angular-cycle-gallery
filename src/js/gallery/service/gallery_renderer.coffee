@@ -24,10 +24,10 @@ angular.module('multiGallery').service 'GalleryRenderer', [
         @_transcludeFunction = transcludeFunction
 
       render: (items)->
-        # todo problem with rendering same element's in cycle. Hard to repeat them
         @_renderedItems.markAllOutdated()
-        @_updateHolder(items)
+        @_updateRenderedPosition(items)
         @_renderedItems.removeOutdated()
+        @_updateHolder()
 
       firstElement: ->
         @_renderedItems.firstElement()
@@ -45,25 +45,22 @@ angular.module('multiGallery').service 'GalleryRenderer', [
       # Private methods
       #
 
+      _updateRenderedPosition: (items) ->
+        for item, i in items
+          @_renderedItems.addItem(i, item)
+
       _updateHolder: (items)->
-        prev_item = null
-        for item in items
-          @_addItemToHolder(prev_item, item) unless @_renderedItems.isRendered(item, true)
-          prev_item = item
+        for item in @_renderedItems.getItemsForRender()
+          $itemScope = @_newItemScope(item.getData())
+          @_transcludeFunction $itemScope, ($element) =>
+            item.setRenderData($itemScope, $element)
+            @_appendItem(item, $element)
 
-      _addItemToHolder: (prev_item, item)->
-        $itemScope = @_newItemScope(item)
-        @_transcludeFunction $itemScope, (element) =>
-          prev_element = @_renderedItems.findElementByData(prev_item)
-          console.log(prev_element)
-          @_appendElement(prev_element, element, item)
-          @_renderedItems.add($itemScope, element, item)
-
-      _appendElement: ($prev_element = null, $element, item)->
-        if $prev_element == null
-          @_$holder.prepend($element) # to the start
+      _appendItem: (item, $element)->
+        if item.getIndex() == 0
+          @_$holder.prepend($element)
         else
-          $prev_element.after($element)
+          @_renderedItems.getElementByIndex( item.getIndex() - 1 ).after($element)
 
       _newItemScope: (item)->
         $itemScope = @_$scope.$new()

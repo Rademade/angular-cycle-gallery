@@ -14,7 +14,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
     _animation: null
 
     _itemWidth: 0
-    _currentIndex: 0
+    _moveIndex: 0
 
     # Public methods
 
@@ -28,22 +28,23 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_storage.setItems(items)
       @_renderer.render( @_storage.getNearestRange() )
       @_loadElementInfo()
-      @_syncCurrentIndex()
+      @_syncMoveIndex()
       @_applyCurrentIndexPosition()
 
     setIndex: (index)->
       @_storage.setIndex(index)
-      @_syncCurrentIndex()
+      @_syncMoveIndex()
+      @_stopPreviusAnimation()
       @_rerender()
 
     next: ->
       @_storage.nextIndex()
-      @_syncCurrentIndex()
+      @_syncMoveIndex()
       @_rerender()
 
     prev: ->
       @_storage.prevIndex()
-      @_syncCurrentIndex()
+      @_syncMoveIndex()
       @_rerender()
 
     animateNext: ->
@@ -80,11 +81,11 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
     _onAnimationComplete: ->
       @_storage.clearRangeBuffer()
-      @_syncCurrentIndex()
+      @_syncMoveIndex()
       @_rerender()
 
     _checkFrameChange: (changeCallback)->
-      return false if (display_index = @_getDisplayIndex()) == @_getCurrentIndex()
+      return false if (display_index = @_getDisplayIndex()) == @_getMoveIndex()
 
       # Stop animation
       @_stopPreviusAnimation()
@@ -98,14 +99,14 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
       # Change current index
       if @_animation_type == @ANIMATION_SIDE_NEXT
-        @_currentIndex++
+        @_moveIndex++
         position_diff = (@_currentHolderPosition() % @_itemWidth) + @_itemWidth
         moveToPosition = @_positionForMoveIndex()
       else
         new_element_index = @_renderer.getElementIndex($element)
 
-        @_currentIndex += new_element_index - display_index
-        @_currentIndex--
+        @_moveIndex += new_element_index - display_index
+        @_moveIndex--
 
         position_diff = (@_currentHolderPosition() % @_itemWidth)
         moveToPosition = @__calculateCenterPositionForIndex( @_storage.NEAREST_ITEMS )
@@ -129,16 +130,16 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_setHolderPosition( @_positionForCurrentIndex() )
 
     _positionForCurrentIndex: ->
-      @__calculateCenterPositionForIndex(@_getCurrentIndex())
+      @__calculateCenterPositionForIndex(@_getMoveIndex())
 
     _getDisplayIndex: ->
       Math.abs( Math.round( @_currentHolderPosition() / @_itemWidth ) )
 
-    _syncCurrentIndex: ->
-      @_currentIndex = @_storage.getCurrentIndexInRange()
+    _syncMoveIndex: ->
+      @_moveIndex = @_storage.getCurrentIndexInRange()
 
-    _getCurrentIndex: ->
-      @_currentIndex
+    _getMoveIndex: ->
+      @_moveIndex
 
     _positionForMoveIndex: ->
       @__calculateCenterPositionForIndex(@_storage.getCurrentIndexInRange())
@@ -151,7 +152,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
     _loadElementInfo: ->
       element = @_renderer.firstElement()
-      @_itemWidth = element.offsetWidth if element #todo it's unposiable for different block size
+      @_itemWidth = element[0].offsetWidth if element #todo it's unposiable for different block size
 
     _rerender: ->
       @_renderer.render( @_storage.getNearestRange() )
