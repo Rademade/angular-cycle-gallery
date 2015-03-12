@@ -26,7 +26,7 @@ angular.module('multiGallery').service 'MoverHolder', ->
       parseInt @_$holder.css('left'), 10
 
     setPosition: (position)->
-      @_$holder.css 'left', position
+      @_$holder.css 'left', position + 'px'
 
     getSlideDiff: ->
       @getCurrentPosition() % @getItemWidth()
