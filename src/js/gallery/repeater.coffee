@@ -59,6 +59,6 @@ angular.module('multiGallery').directive 'galleryRepeater', [
 
       # Methods
 
-      $rootScope.setGalleryIndex = (index)-> mover.setIndex( index )
+      $rootScope.setGalleryIndex = (index)-> mover.setIndex( index - 0 )
 
 ]
