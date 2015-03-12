@@ -15,8 +15,9 @@ angular.module('multiGallery').service 'MoverHolder', ->
       Math.abs( Math.round( @getCurrentPosition() / @getItemWidth() ) )
 
     getItemWidth: ->
-      @_itemWidth ||= @_$holder.children().eq(0)[0].offsetWidth
-      # load from holde
+      return @_itemWidth if @_itemWidth
+      $element = @_$holder.children().eq(0)
+      @_itemWidth = $element[0].offsetWidth if $element[0]
 
     getCurrentPosition: ->
       parseInt @_$holder.css('left'), 10
