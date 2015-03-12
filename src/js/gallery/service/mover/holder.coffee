@@ -8,14 +8,17 @@ angular.module('multiGallery').service 'MoverHolder', ->
     constructor: ($holder)->
       @_$holder = $holder
 
+    update: ->
+      @getItemWidth(false)
+
     getElement: ->
       @_$holder
 
     getDisplayIndex: ->
       Math.abs( Math.round( @getCurrentPosition() / @getItemWidth() ) )
 
-    getItemWidth: ->
-      return @_itemWidth if @_itemWidth
+    getItemWidth: (cached = true)->
+      return @_itemWidth if @_itemWidth and cached
       $element = @_$holder.children().eq(0)
       @_itemWidth = $element[0].offsetWidth if $element[0]
 

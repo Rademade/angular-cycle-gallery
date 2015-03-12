@@ -37,12 +37,14 @@ angular.module('multiGallery').service 'ItemsStorage', [
         cycle_multiplier = (((items_count + @index) / @count) | 0) + 1
         from_index = @count * cycle_multiplier - items_count + @index
         to_index = from_index + items_count
+        console.log('PREV RANGE', from_index, to_index, @index)
         @prevCycleItems.sliceItems(from_index, to_index)
 
       getNextRangeItems: ->
         items_count = @NEAREST_ITEMS + @nextBuffer
         from_index = @index
         to_index = from_index + items_count + 1
+        console.log('NEXT RANGE', from_index, to_index, @index)
         @nextCycleItems.sliceItems(from_index, to_index)
 
       nextIndex: ->

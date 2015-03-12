@@ -18,6 +18,7 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       _collectionName = _matchResult[2]
       _galleryIndexName = '$galleryIndex'
       _$holder = $element.parent()
+      _$body = angular.element(document).find('body')
 
       # Classes
 
@@ -37,6 +38,24 @@ angular.module('multiGallery').directive 'galleryRepeater', [
 
       $scope.$watchCollection _collectionName, (items)-> mover.render(items)
 
+
+      # TODO
+
+      trigger = false
+      start_position = 0
+
+      _$holder.on 'mousedown', (e)->
+        trigger = true
+        start_position = e.x
+
+      _$body.on 'mouseup', ->
+        trigger = false
+#        mover.touchEnd()
+
+      _$body.on 'mousemove', (e)->
+        return true unless trigger
+        move = start_position - e.x
+        mover.touchMove(move)
 
       # Methods
 

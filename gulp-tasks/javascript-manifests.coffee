@@ -9,7 +9,6 @@ module.exports = (->
       'angular/angular'
       'angular-swipe/dist/angular-swipe'
       'gsap/src/uncompressed/TweenMax'
-      'angular-uuid4/angular-uuid4.min'
     ], "bower_components", 'js'
 
   manifests.library = ->
