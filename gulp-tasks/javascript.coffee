@@ -31,19 +31,13 @@ gulp.task 'javascript', [
 ###
 
 gulp.task 'javascript:build', ['javascript'], ->
-  deferred = Q.defer()
-
-  js_filename = 'angular-cycle-gallery.min.js'
-  js_directory = file_manager.build
-
-  stream = collectJavaScript([
+  files = [
     "#{file_manager.public}/library.js"
-  ], js_filename, js_directory, {coffee: no, compress: yes})
+  ]
 
-  stream.on 'end', -> deferred.resolve()
-  stream.on 'error', (e)-> console.log(e)
+  collectJavaScript(files, 'angular-cycle-gallery.js', file_manager.build, {coffee: no})
+  collectJavaScript(files, 'angular-cycle-gallery.min.js', file_manager.build, {coffee: no, compress: yes})
 
-  deferred.promise
 
 ###
   JavaScript private methods

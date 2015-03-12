@@ -4,7 +4,7 @@ angular.module('multiGallery').service 'GalleryMover', [
 
     class GalleryMover
 
-      ANIMATION_TIME: 500
+      ANIMATION_TIME: 300
       ANIMATION_SIDE_NEXT: 1
       ANIMATION_SIDE_PREV: 2
 
@@ -29,6 +29,7 @@ angular.module('multiGallery').service 'GalleryMover', [
       render: (items)->
         @_storage.setItems(items)
         @_renderer.render( @_storage.getNearestRange() )
+        @_holder.update()
         @_syncMoveIndex()
         @_applyCurrentIndexPosition()
 
@@ -62,6 +63,16 @@ angular.module('multiGallery').service 'GalleryMover', [
         @_animation_side = @ANIMATION_SIDE_PREV
         @_storage.incPrevBuffer()
         @_animate()
+
+      touchMove: (move)->
+        console.log(move)
+        @_holder.setPosition( @_getPositionForMoveIndex() - move )
+
+      touchEnd: ->
+#        move_index = @_holder.getDisplayIndex()
+#        index_diff = move_index - @_storage.getCurrentIndexInRange()
+#        @_storage.setIndex( @_storage.getIndex() + index_diff )
+#        @_animate()
 
 
       # Animation block

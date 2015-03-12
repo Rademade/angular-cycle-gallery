@@ -15,10 +15,14 @@ angular.module('multiGallery').service 'RenderedItem', ->
       @_data = data
       @_outdate = no
 
-    getIndex: -> @_index
+    getIndex: ->
+      @_index
 
-    isDataMatch: (data)-> @_data._$UUID == data._$UUID
-    getData: -> @_data
+    isDataMatch: (data)->
+      @_data._$UUID == data._$UUID
+
+    getData: ->
+      @_data
 
     getElement: -> @_element
 
@@ -37,9 +41,12 @@ angular.module('multiGallery').service 'RenderedItem', ->
       @_element.remove()
       @_scope.$destroy()
 
-    isOutdate: -> @_outdate
-    markOutdated: ->  @_outdate = yes
+    isOutdate: ->
+      @_outdate
+
+    markOutdated: ->
+      @_outdate = yes
 
     isWaitingForRender: ->
-      not @isOutdate() and @_rendered == no
+      @_outdate == no and @_rendered == no
 

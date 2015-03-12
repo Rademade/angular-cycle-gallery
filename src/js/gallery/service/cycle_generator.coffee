@@ -1,33 +1,31 @@
-angular.module('multiGallery').service 'CycleGenerator', [
-  'uuid4'
-  (uuid4)->
+angular.module('multiGallery').service 'CycleGenerator', ->
 
-    class CycleGenerator
+  AUTO_INCREMENT = 0
 
-      _count: 0
-      _items: []
+  class CycleGenerator
 
-      _cycleItems: []
+    _count: 0
+    _items: []
 
-      setItems: (items)->
-        @_items = items
-        @_count = items.length
-        @_cycleItems = []
-        @_cycleGenerate(1)
+    _cycleItems: []
 
-      sliceItems: (from, to) ->
-        @_cycleGenerate( Math.ceil(to/@_count) ) if to > @_cycleItems.length - 1
-        @_cycleItems.slice(from, to)
+    setItems: (items)->
+      @_items = items
+      @_count = items.length
+      @_cycleItems = []
+      @_cycleGenerate(1)
 
-      _cycleGenerate: (cycleMultiplier)->
-        for i in [0..cycleMultiplier]
-          # todo make safe cloning
-          items = JSON.parse( JSON.stringify( @_items ) )
-          @_cycleItems = @_cycleItems.concat( @_addUIID(items) )
+    sliceItems: (from, to) ->
+      @_cycleGenerate( Math.ceil(to/@_count) ) if to > @_cycleItems.length - 1
+      @_cycleItems.slice(from, to)
 
-      _addUIID: (items)->
-        for item in items
-          item._$UUID = uuid4.generate()
-        items
+    _cycleGenerate: (cycleMultiplier)->
+      for i in [0..cycleMultiplier]
+        # todo make safe cloning
+        items = JSON.parse( JSON.stringify( @_items ) )
+        @_cycleItems = @_cycleItems.concat( @_addUIID(items) )
 
-]
+    _addUIID: (items)->
+      for item in items
+        item._$UUID = ++AUTO_INCREMENT
+      items
