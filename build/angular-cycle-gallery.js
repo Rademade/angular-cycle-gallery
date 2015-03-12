@@ -78,7 +78,7 @@
             return mover.touchMove(move);
           });
           return $rootScope.setGalleryIndex = function(index) {
-            return mover.setIndex(index);
+            return mover.setIndex(index - 0);
           };
         }
       };
@@ -851,7 +851,7 @@
       };
 
       MoverHolder.prototype.setPosition = function(position) {
-        return this._$holder.css('left', position);
+        return this._$holder.css('left', position + 'px');
       };
 
       MoverHolder.prototype.getSlideDiff = function() {
