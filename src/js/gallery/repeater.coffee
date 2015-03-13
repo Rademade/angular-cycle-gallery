@@ -1,6 +1,6 @@
 angular.module('multiGallery').directive 'galleryRepeater', [
-  'GalleryRenderer', 'ItemsStorage', 'GalleryMover', 'GalleryEvents', '$rootScope'
-  (GalleryRenderer, ItemsStorage, GalleryMover, GalleryEvents, $rootScope)->
+  'GalleryRenderer', 'ItemsStorage', 'MoverHolder', 'GalleryMover', 'GalleryEvents', '$rootScope'
+  (GalleryRenderer, ItemsStorage, MoverHolder, GalleryMover, GalleryEvents, $rootScope)->
 
     terminal: true
     transclude : 'element'
@@ -24,7 +24,8 @@ angular.module('multiGallery').directive 'galleryRepeater', [
 
       storage = new ItemsStorage()
       gallery = new GalleryRenderer($scope, _scopeItemName, _$holder, renderFunction)
-      mover = new GalleryMover(storage, gallery, _$holder, $scope)
+      holder = new MoverHolder(_$holder)
+      mover = new GalleryMover(storage, gallery, holder, $scope)
 
       # todo update with in resize
 
@@ -39,10 +40,9 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       $scope.$watchCollection _collectionName, (items)-> mover.render(items)
 
 
-      # TODO
-
       trigger = false
       start_position = 0
+      slide_diff = 0
 
       _$holder.on 'mousedown', (e)->
         trigger = true
@@ -54,11 +54,12 @@ angular.module('multiGallery').directive 'galleryRepeater', [
 
       _$body.on 'mousemove', (e)->
         return true unless trigger
-        move = start_position - e.x
+        console.log('SLIDE', slide_diff, move)
+        move = e.x - start_position
         mover.touchMove(move)
 
       # Methods
 
-      $rootScope.setGalleryIndex = (index)-> mover.setIndex( index )
+      $rootScope.setGalleryIndex = (index)-> mover.setIndex( index - 0 )
 
 ]
