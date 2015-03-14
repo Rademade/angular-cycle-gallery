@@ -23,7 +23,15 @@ angular.module('multiGallery').service 'MoverTouch', ->
       return true unless @trigger
       @trigger = false
       @start_position = 0
+      position_diff = @_holder.getSlideDiff()
+
       @_mover.applyIndexDiff( @_holder.getDisplayIndex() - @_mover.getTrueMoveIndex() )
+
+      position_diff += @_holder.getItemWidth() if first_half
+      first_half = Math.abs(position_diff) > @_holder.getItemWidth()/2
+
+      @_holder.setPosition( @_holder.getCurrentPosition() + position_diff )
+      @_mover._animate()
 
     touchMove: (position)->
       return true unless @trigger

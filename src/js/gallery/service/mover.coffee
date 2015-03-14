@@ -2,7 +2,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
   class GalleryMover
 
-    ANIMATION_TIME: 600
+    ANIMATION_TIME: 300
     ANIMATION_SIDE_NEXT: 1
     ANIMATION_SIDE_PREV: 2
 
