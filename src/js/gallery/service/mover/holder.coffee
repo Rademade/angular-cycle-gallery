@@ -5,6 +5,8 @@ angular.module('multiGallery').service 'MoverHolder', ->
     _$holder: null
     _itemWidth: 0
 
+    _position_lock: null
+
     constructor: ($holder)->
       @_$holder = $holder
 
@@ -26,11 +28,20 @@ angular.module('multiGallery').service 'MoverHolder', ->
       parseInt @_$holder.css('left'), 10
 
     setPosition: (position)->
-      @_$holder.css 'left', position
+      @_$holder.css 'left', position + 'px'
 
     getSlideDiff: ->
       @getCurrentPosition() % @getItemWidth()
 
     __calculatePositionForIndex: (index)->
       @getItemWidth() * index * -1
+
+    createPositionLock: ->
+      @_position_lock = @getCurrentPosition() unless @_position_lock
+
+    getPositionLockDiff: ->
+      @getCurrentPosition() - @_position_lock
+
+    clearPositionLock: ->
+      @_position_lock = null
 

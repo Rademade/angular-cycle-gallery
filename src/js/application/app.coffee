@@ -7,13 +7,19 @@ app.controller 'AppController', ['$scope', ($scope) ->
     {text: 'Item 2', color: 'blue'}
     {text: 'Item 3', color: 'green'}
     {text: 'Item 4', color: 'yellow'}
-#    {text: 'Item 5', color: 'black'}
-#    {text: 'Item 6', color: 'grey'}
-#    {text: 'Item 7', color: 'purple'}
-#    {text: 'Item 8', color: 'darkgreen'}
-#    {text: 'Item 9', color: 'darkblue'}
-#    {text: 'Item 10', color: 'darkgrey'}
+    {text: 'Item 5', color: 'black'}
+    {text: 'Item 6', color: 'grey'}
+    {text: 'Item 7', color: 'purple'}
+    {text: 'Item 8', color: 'darkgreen'}
+    {text: 'Item 9', color: 'darkblue'}
+    {text: 'Item 11', color: 'darkgrey'}
+    {text: 'Item 12', color: 'darkgrey'}
+    {text: 'Item 13', color: 'darkgrey'}
+    {text: 'Item 14', color: 'darkgrey'}
+    {text: 'Item 15', color: 'darkgrey'}
+    {text: 'Item 16', color: 'darkgrey'}
   ]
+
 
   $scope.add = ->
     count = $scope.gallery.length

@@ -1,161 +1,187 @@
-angular.module('multiGallery').service 'GalleryMover', [
-  'MoverHolder',
-  (MoverHolder)->
+angular.module('multiGallery').service 'GalleryMover', ->
 
-    class GalleryMover
+  class GalleryMover
 
-      ANIMATION_TIME: 300
-      ANIMATION_SIDE_NEXT: 1
-      ANIMATION_SIDE_PREV: 2
+    ANIMATION_TIME: 600
+    ANIMATION_SIDE_NEXT: 1
+    ANIMATION_SIDE_PREV: 2
 
-      _storage: null
-      _renderer: null
-      _holder: null
-      _$scope: null
+    _storage: null
+    _renderer: null
+    _holder: null
+    _$scope: null
 
-      _animation: null
+    _animation: null
 
-      _itemWidth: 0
-      _moveIndex: 0
+    _checked_position: null
 
-      # Public methods
+    _itemWidth: 0
+    _moveIndex: 0
 
-      constructor: (storage, renderer, $holder, $scope)->
-        @_storage = storage
-        @_renderer = renderer
-        @_holder = new MoverHolder($holder)
-        @_$scope = $scope
+    # Public methods
 
-      render: (items)->
-        @_storage.setItems(items)
-        @_renderer.render( @_storage.getNearestRange() )
-        @_holder.update()
-        @_syncMoveIndex()
-        @_applyCurrentIndexPosition()
+    constructor: (storage, renderer, holder, $scope)->
+      @_storage = storage
+      @_renderer = renderer
+      @_holder = holder
+      @_$scope = $scope
 
-      setIndex: (index)->
-        return @_stopAnimationSide() if @_animation_side
-        @_storage.setIndex(index)
-        @_syncMoveIndex()
-        @_stopPreviusAnimation()
-        @_rerender()
+    render: (items)->
+      @_storage.setItems(items)
+      @_renderer.render( @_storage.getNearestRange() )
+      @_holder.update()
+      @_syncMoveIndex()
+      @_applyCurrentIndexPosition()
 
-      next: ->
-        return @_stopAnimationSide() if @_animation_side
-        @_storage.nextIndex()
-        @_syncMoveIndex()
-        @_rerender()
+    setIndex: (index)->
+      return @_stopAnimationSide() if @_animation_side
+      @_storage.setIndex(index)
+      @_syncMoveIndex()
+      @_stopPreviusAnimation()
+      @_rerender()
 
-      prev: ->
-        return @_stopAnimationSide() if @_animation_side
-        @_storage.prevIndex()
-        @_syncMoveIndex()
-        @_rerender()
+    next: ->
+      return @_stopAnimationSide() if @_animation_side
+      @_storage.nextIndex()
+      @_syncMoveIndex()
+      @_rerender()
 
-      animateNext: ->
-        return @_stopAnimationSide() if @_animation_side == @ANIMATION_SIDE_PREV
+    prev: ->
+      return @_stopAnimationSide() if @_animation_side
+      @_storage.prevIndex()
+      @_syncMoveIndex()
+      @_rerender()
+
+    animateNext: ->
+      return @_stopAnimationSide() if @_animation_side == @ANIMATION_SIDE_PREV
+      @_clearAnimationTime()
+      @_storage.incNextBuffer()
+      @_animate()
+
+    animatePrev: ->
+      return @_stopAnimationSide() if @_animation_side == @ANIMATION_SIDE_NEXT
+      @_clearAnimationTime()
+      @_storage.incPrevBuffer()
+      @_animate()
+
+    forceMove: (position)->
+      @_holder.setPosition( @_getPositionForMoveIndex() + position )
+      @_detectPosition()
+
+    applyIndexDiff: (index_diff)->
+      @_storage.setIndex( @_storage.getIndex() + index_diff )
+      @_storage.clearRangeBuffer()
+      @_syncMoveIndex()
+      @_rerender()
+      @_detectPositionClear()
+
+
+    # Animation kill
+
+    _stopPreviusAnimation: ->
+      @_animation.pause() if @_animation
+      @_animation.kill() if @_animation
+
+    _stopAnimationSide: ->
+      @_stopPreviusAnimation()
+      @_clearAnimationTime()
+      @_animation_side = null
+      @_storage.clearRangeBuffer()
+      @_syncMoveIndex()
+      @_rerender()
+
+    # Animation time
+
+    _getAnimationTime: ->
+      timestamp = (new Date()).getTime()
+      @_animationStartTime = timestamp unless @_animationStartTime
+      @ANIMATION_TIME - (timestamp - @_animationStartTime)
+
+    _clearAnimationTime: ->
+      @_animationStartTime = null
+
+    # Animation block
+
+    _animate: (position = @_getPositionForCurrentIndex())->
+      @_stopPreviusAnimation()
+      # Todo make request animation frame animation. Remove dependencies
+      @_animation = TweenMax.to(@_holder.getElement(), @_getAnimationTime()/1000, {
+        left: position + 'px'
+        ease: Linear.easeNone
+        onUpdate: => @_checkFrameChange()
+        onComplete: => @_onCompleteAnimation()
+      })
+
+    _onCompleteAnimation: ->
+      @_clearAnimationTime()
+      @_detectPositionClear()
+      @_storage.clearRangeBuffer()
+      @_syncMoveIndex()
+      @_rerender()
+
+    _detectPosition: ->
+      @_holder.createPositionLock()
+      position_diff = @_holder.getPositionLockDiff()
+      return false unless Math.abs(position_diff) > 5
+      if position_diff < 0
         @_animation_side = @ANIMATION_SIDE_NEXT
-        @_storage.incNextBuffer()
-        @_animate()
-
-      animatePrev: ->
-        return @_stopAnimationSide() if @_animation_side == @ANIMATION_SIDE_NEXT
+      else
         @_animation_side = @ANIMATION_SIDE_PREV
-        @_storage.incPrevBuffer()
-        @_animate()
+      return true
 
-      touchMove: (move)->
-        console.log(move)
-        @_holder.setPosition( @_getPositionForMoveIndex() - move )
+    _detectPositionClear: ->
+      @_holder.clearPositionLock()
+      @_animation_side = null
 
-      touchEnd: ->
-#        move_index = @_holder.getDisplayIndex()
-#        index_diff = move_index - @_storage.getCurrentIndexInRange()
-#        @_storage.setIndex( @_storage.getIndex() + index_diff )
-#        @_animate()
+    _checkFrameChange: (changeCallback)->
+      return false unless @_detectPosition()
+      return false if (display_index = @_holder.getDisplayIndex()) == @getMoveIndex()
 
+      @_stopPreviusAnimation()
 
-      # Animation block
+      # Positions
+      $current_element = @_renderer.getElementByIndex(display_index)
+      right_items_count = @_renderer.getRightElementsCount($current_element ) # For prev animation it not change
 
-      _defaultAnimationTime: ->
-        @ANIMATION_TIME/1000
+      # ReRender new elements
+      @_animationRender()
 
-      _stopPreviusAnimation: ->
-        @_animation.pause() if @_animation
-        @_animation.kill() if @_animation
+      # Change current index
+      if @_animation_side == @ANIMATION_SIDE_NEXT
+        @_moveIndex++
+        moveToPosition = @_getPositionForCurrentIndex()
+      else
+        @_moveIndex = @_renderer.getRenderedCount() - right_items_count
+        moveToPosition = @_holder.__calculatePositionForIndex( @_storage.NEAREST_ITEMS )
+        @_holder.setPosition( @_getPositionForMoveIndex() + @_holder.getSlideDiff() )
 
-      _stopAnimationSide: ->
-        @_stopPreviusAnimation()
-        @_animation_side = null
-        @_storage.clearRangeBuffer()
-        @_syncMoveIndex()
-        @_rerender()
+      # Change position
+      @_detectPositionClear()
 
-      _animate: (
-        time = @_defaultAnimationTime()
-        position = @_getPositionForCurrentIndex()
-      )->
-        @_stopPreviusAnimation()
-        # Todo make request animation frame animation
-        @_animation = TweenMax.to(@_holder.getElement(), time, {
-          left: position + 'px'
-          ease: Linear.easeNone
-          onUpdate: => @_checkFrameChange()
-          onComplete: => @_onCompleteAnimation()
-        })
-
-      _onCompleteAnimation: ->
-        @_animation_side = null
-        @_storage.clearRangeBuffer()
-        @_syncMoveIndex()
-        @_rerender()
-
-      _checkFrameChange: (changeCallback)->
-        return false if (display_index = @_holder.getDisplayIndex()) == @_getMoveIndex()
-        @_stopPreviusAnimation()
-
-        # Positions
-        $current_element = @_renderer.getElementByIndex(display_index)
-        right_items_count = @_renderer.getRightElementsCount($current_element )
-
-        # Render
-        @_animationRender()
-
-        # Change current index
-        if @_animation_side == @ANIMATION_SIDE_NEXT
-          @_moveIndex++
-          moveToPosition = @_getPositionForCurrentIndex()
-        else
-          @_moveIndex = @_renderer.getRenderedCount() - right_items_count
-          moveToPosition = @_holder.__calculatePositionForIndex( @_storage.NEAREST_ITEMS )
-
-          @_holder.setPosition( @_getPositionForMoveIndex() + @_holder.getSlideDiff() )
-
-        # Change position
-        @_animate(null, moveToPosition)
+      # Animate
+      @_animate(moveToPosition)
 
 
-      # Index and position calculation
+    # Index and position calculation
 
-      _applyMoveIndexPosition: -> @_holder.setPosition( @_getPositionForMoveIndex() )
-      _applyCurrentIndexPosition: -> @_holder.setPosition( @_getPositionForCurrentIndex() )
+    _applyMoveIndexPosition: -> @_holder.setPosition( @_getPositionForMoveIndex() )
+    _applyCurrentIndexPosition: -> @_holder.setPosition( @_getPositionForCurrentIndex() )
 
-      _getPositionForMoveIndex: -> @_holder.__calculatePositionForIndex(@_getMoveIndex())
-      _getPositionForCurrentIndex: -> @_holder.__calculatePositionForIndex(@_storage.getCurrentIndexInRange())
+    _getPositionForMoveIndex: -> @_holder.__calculatePositionForIndex(@getMoveIndex())
+    _getPositionForCurrentIndex: -> @_holder.__calculatePositionForIndex(@getTrueMoveIndex())
 
-      _syncMoveIndex: ->  @_moveIndex = @_storage.getCurrentIndexInRange()
-      _getMoveIndex: -> @_moveIndex
+    getTrueMoveIndex: -> @_storage.getCurrentIndexInRange()
+    getMoveIndex: -> @_moveIndex
+    _syncMoveIndex: ->  @_moveIndex = @getTrueMoveIndex()
 
 
-      # Render function
+    # Render function
 
-      _animationRender: ->
-        @_renderer.render( @_storage.getNearestRange() )
-        @_$scope.$apply()
+    _animationRender: ->
+      @_renderer.render( @_storage.getNearestRange() )
+      @_$scope.$apply()
 
-      _rerender: ->
-        @_renderer.render( @_storage.getNearestRange() )
-        @_applyMoveIndexPosition()
-        @_$scope.$apply() unless @_$scope.$$phase
-
-]
+    _rerender: ->
+      @_renderer.render( @_storage.getNearestRange() )
+      @_applyMoveIndexPosition()
+      @_$scope.$apply() unless @_$scope.$$phase

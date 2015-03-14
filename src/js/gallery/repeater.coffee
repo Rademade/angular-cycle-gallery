@@ -1,6 +1,6 @@
 angular.module('multiGallery').directive 'galleryRepeater', [
-  'GalleryRenderer', 'ItemsStorage', 'GalleryMover', 'GalleryEvents', '$rootScope'
-  (GalleryRenderer, ItemsStorage, GalleryMover, GalleryEvents, $rootScope)->
+  'GalleryRenderer', 'ItemsStorage', 'MoverHolder', 'GalleryMover', 'MoverTouch', 'GalleryEvents', 'Resize', '$window', '$rootScope'
+  (GalleryRenderer, ItemsStorage, MoverHolder, GalleryMover, MoverTouch, GalleryEvents, Resize, $window, $rootScope)->
 
     terminal: true
     transclude : 'element'
@@ -24,9 +24,10 @@ angular.module('multiGallery').directive 'galleryRepeater', [
 
       storage = new ItemsStorage()
       gallery = new GalleryRenderer($scope, _scopeItemName, _$holder, renderFunction)
-      mover = new GalleryMover(storage, gallery, _$holder, $scope)
-
-      # todo update with in resize
+      holder = new MoverHolder(_$holder)
+      mover = new GalleryMover(storage, gallery, holder, $scope)
+      touch = new MoverTouch(mover, holder)
+      resize = new Resize(mover, holder)
 
       # Events
 
@@ -34,31 +35,29 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       GalleryEvents.on 'move:prev', -> mover.prev()
       GalleryEvents.on 'animate:next', -> mover.animateNext()
       GalleryEvents.on 'animate:prev', -> mover.animatePrev()
-      GalleryEvents.on 'index:update', -> $scope[_galleryIndexName] = storage.getIndex()
+      GalleryEvents.on 'index:update', -> updateIndex()
 
       $scope.$watchCollection _collectionName, (items)-> mover.render(items)
 
+      # Document events
+      angular.element($window).bind 'resize', -> resize.do()
 
-      # TODO
 
-      trigger = false
-      start_position = 0
+      # Touch events
 
-      _$holder.on 'mousedown', (e)->
-        trigger = true
-        start_position = e.x
+      _$holder.on 'touchstart', (e)-> touch.touchStart(e.touches[0].pageX)
+      _$body.on 'touchend', (e)-> touch.touchEnd()
+      _$body.on 'touchmove', (e)-> touch.touchMove(e.touches[0].pageX)
 
-      _$body.on 'mouseup', ->
-        trigger = false
-#        mover.touchEnd()
-
-      _$body.on 'mousemove', (e)->
-        return true unless trigger
-        move = start_position - e.x
-        mover.touchMove(move)
 
       # Methods
 
-      $rootScope.setGalleryIndex = (index)-> mover.setIndex( index )
+      $rootScope.setGalleryIndex = (index)-> mover.setIndex( index - 0 )
+
+
+      # Private methods
+
+      updateIndex = -> $scope[_galleryIndexName] = storage.getIndex()
+      updateIndex()
 
 ]
