@@ -62,14 +62,16 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_storage.incPrevBuffer()
       @_animate()
 
-    touchMove: (move)->
-      @_holder.setPosition( @_getPositionForMoveIndex() - move )
+    forceMove: (position)->
+      @_holder.setPosition( @_getPositionForMoveIndex() + position )
+      @_detectPosition()
 
-    touchEnd: ->
-#        move_index = @_holder.getDisplayIndex()
-#        index_diff = move_index - @_storage.getCurrentIndexInRange()
-#        @_storage.setIndex( @_storage.getIndex() + index_diff )
-#        @_animate()
+    applyIndexDiff: (index_diff)->
+      @_storage.setIndex( @_storage.getIndex() + index_diff )
+      @_animationRender()
+      @_syncMoveIndex()
+      @_holder.setPosition( @_getPositionForMoveIndex() )
+      @_detectPositionClear()
 
 
     # Animation block
@@ -124,7 +126,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
     _checkFrameChange: (changeCallback)->
       return unless @_detectPosition()
 
-      return false if (display_index = @_holder.getDisplayIndex()) == @_getMoveIndex()
+      return false if (display_index = @_holder.getDisplayIndex()) == @getMoveIndex()
       @_stopPreviusAnimation()
 
       # Positions
@@ -144,7 +146,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
         @_moveIndex = @_renderer.getRenderedCount() - right_items_count
         moveToPosition = @_holder.__calculatePositionForIndex( @_storage.NEAREST_ITEMS )
 
-        # todo fix position
+        # todo fix position. Has problem
         @_holder.setPosition( @_getPositionForMoveIndex() + @_holder.getSlideDiff() )
 
       # Change position
@@ -159,11 +161,12 @@ angular.module('multiGallery').service 'GalleryMover', ->
     _applyMoveIndexPosition: -> @_holder.setPosition( @_getPositionForMoveIndex() )
     _applyCurrentIndexPosition: -> @_holder.setPosition( @_getPositionForCurrentIndex() )
 
-    _getPositionForMoveIndex: -> @_holder.__calculatePositionForIndex(@_getMoveIndex())
-    _getPositionForCurrentIndex: -> @_holder.__calculatePositionForIndex(@_storage.getCurrentIndexInRange())
+    _getPositionForMoveIndex: -> @_holder.__calculatePositionForIndex(@getMoveIndex())
+    _getPositionForCurrentIndex: -> @_holder.__calculatePositionForIndex(@getTrueMoveIndex())
 
-    _syncMoveIndex: ->  @_moveIndex = @_storage.getCurrentIndexInRange()
-    _getMoveIndex: -> @_moveIndex
+    getTrueMoveIndex: -> @_storage.getCurrentIndexInRange()
+    getMoveIndex: -> @_moveIndex
+    _syncMoveIndex: ->  @_moveIndex = @getTrueMoveIndex()
 
 
     # Render function

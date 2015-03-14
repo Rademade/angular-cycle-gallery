@@ -6,8 +6,8 @@ body
 
 .gallery-wrapper
     position: relative
-    width: 500px
-    height: 500px
+    width:  50%
+    height: 50%
     overflow: hidden
     border: 1px solid #000
     margin: 0 auto
@@ -19,32 +19,32 @@ body
     user-select: none
 
 .gallery-slider
-    position: absolute
-    width: 10000%
-
-    &.animation
-        @include transition(all 2s linear)
+    position: relative
+    width: 100%
+    height: 100%
+    white-space: nowrap
 
 .action-button
+    height: 20px
 
     &.next
         position: absolute
-        top: 200px
+        top: 10%
         right: 10px
 
     &.prev
         position: absolute
-        top: 200px
+        top: 10%
         left: 10px
 
     &.animate
-        top: 220px
+        top: 50%
 
 .gallery-item
+    display: inline-block
+    width: 100%
+    height: 100%
     border: 1px solid #000
-    width: 500px
-    height: 500px
-    float: left
 
     .gallery-item-content
         text-align: center
