@@ -435,7 +435,7 @@
   angular.module('multiGallery').service('GalleryMover', function() {
     var GalleryMover;
     return GalleryMover = (function() {
-      GalleryMover.prototype.ANIMATION_TIME = 600;
+      GalleryMover.prototype.ANIMATION_TIME = 300;
 
       GalleryMover.prototype.ANIMATION_SIDE_NEXT = 1;
 
@@ -993,12 +993,20 @@
       };
 
       MoverTouch.prototype.touchEnd = function() {
+        var first_half, position_diff;
         if (!this.trigger) {
           return true;
         }
         this.trigger = false;
         this.start_position = 0;
-        return this._mover.applyIndexDiff(this._holder.getDisplayIndex() - this._mover.getTrueMoveIndex());
+        position_diff = this._holder.getSlideDiff();
+        this._mover.applyIndexDiff(this._holder.getDisplayIndex() - this._mover.getTrueMoveIndex());
+        if (first_half) {
+          position_diff += this._holder.getItemWidth();
+        }
+        first_half = Math.abs(position_diff) > this._holder.getItemWidth() / 2;
+        this._holder.setPosition(this._holder.getCurrentPosition() + position_diff);
+        return this._mover._animate();
       };
 
       MoverTouch.prototype.touchMove = function(position) {
