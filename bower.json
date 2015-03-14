@@ -4,8 +4,6 @@
   "main": "build/angular-cycle-gallery.min.js",
   "dependencies": {
     "angular": "~1.2.12",
-    "angular-swipe": "git@github.com:marmorkuchen-net/angular-swipe.git",
-    "gsap": "~1.16.0",
-    "angular-uuid4": "~0.3.0"
+    "gsap": "~1.16.0"
   }
 }
