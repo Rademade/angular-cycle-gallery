@@ -16,9 +16,11 @@ angular.module('multiGallery').service 'MoverTouch', ->
 
     touchStart: (position)->
       @trigger = true
+      @_mover._stopPreviusAnimation() # todo fix name
       @start_position = position
 
     touchEnd: ->
+      return true unless @trigger
       @trigger = false
       @start_position = 0
       @_mover.applyIndexDiff( @_holder.getDisplayIndex() - @_mover.getTrueMoveIndex() )

@@ -2,7 +2,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
   class GalleryMover
 
-    ANIMATION_TIME: 300
+    ANIMATION_TIME: 600
     ANIMATION_SIDE_NEXT: 1
     ANIMATION_SIDE_PREV: 2
 
@@ -54,11 +54,13 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
     animateNext: ->
       return @_stopAnimationSide() if @_animation_side == @ANIMATION_SIDE_PREV
+      @_clearAnimationTime()
       @_storage.incNextBuffer()
       @_animate()
 
     animatePrev: ->
       return @_stopAnimationSide() if @_animation_side == @ANIMATION_SIDE_NEXT
+      @_clearAnimationTime()
       @_storage.incPrevBuffer()
       @_animate()
 
@@ -68,16 +70,13 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
     applyIndexDiff: (index_diff)->
       @_storage.setIndex( @_storage.getIndex() + index_diff )
-      @_animationRender()
+      @_storage.clearRangeBuffer()
       @_syncMoveIndex()
-      @_holder.setPosition( @_getPositionForMoveIndex() )
+      @_rerender()
       @_detectPositionClear()
 
 
-    # Animation block
-
-    _defaultAnimationTime: ->
-      @ANIMATION_TIME/1000
+    # Animation kill
 
     _stopPreviusAnimation: ->
       @_animation.pause() if @_animation
@@ -85,18 +84,28 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
     _stopAnimationSide: ->
       @_stopPreviusAnimation()
+      @_clearAnimationTime()
       @_animation_side = null
       @_storage.clearRangeBuffer()
       @_syncMoveIndex()
       @_rerender()
 
-    _animate: (
-      time = @_defaultAnimationTime()
-      position = @_getPositionForCurrentIndex()
-    )->
+    # Animation time
+
+    _getAnimationTime: ->
+      timestamp = (new Date()).getTime()
+      @_animationStartTime = timestamp unless @_animationStartTime
+      @ANIMATION_TIME - (timestamp - @_animationStartTime)
+
+    _clearAnimationTime: ->
+      @_animationStartTime = null
+
+    # Animation block
+
+    _animate: (position = @_getPositionForCurrentIndex())->
       @_stopPreviusAnimation()
-      # Todo make request animation frame animation
-      @_animation = TweenMax.to(@_holder.getElement(), time, {
+      # Todo make request animation frame animation. Remove dependencies
+      @_animation = TweenMax.to(@_holder.getElement(), @_getAnimationTime()/1000, {
         left: position + 'px'
         ease: Linear.easeNone
         onUpdate: => @_checkFrameChange()
@@ -104,6 +113,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
       })
 
     _onCompleteAnimation: ->
+      @_clearAnimationTime()
       @_detectPositionClear()
       @_storage.clearRangeBuffer()
       @_syncMoveIndex()
@@ -124,19 +134,17 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_animation_side = null
 
     _checkFrameChange: (changeCallback)->
-      return unless @_detectPosition()
-
+      return false unless @_detectPosition()
       return false if (display_index = @_holder.getDisplayIndex()) == @getMoveIndex()
+
       @_stopPreviusAnimation()
 
       # Positions
       $current_element = @_renderer.getElementByIndex(display_index)
-      right_items_count = @_renderer.getRightElementsCount($current_element )
+      right_items_count = @_renderer.getRightElementsCount($current_element ) # For prev animation it not change
 
-      # Render
+      # ReRender new elements
       @_animationRender()
-
-      new_right_items_count = @_renderer.getRightElementsCount($current_element )
 
       # Change current index
       if @_animation_side == @ANIMATION_SIDE_NEXT
@@ -145,15 +153,13 @@ angular.module('multiGallery').service 'GalleryMover', ->
       else
         @_moveIndex = @_renderer.getRenderedCount() - right_items_count
         moveToPosition = @_holder.__calculatePositionForIndex( @_storage.NEAREST_ITEMS )
-
-        # todo fix position. Has problem
         @_holder.setPosition( @_getPositionForMoveIndex() + @_holder.getSlideDiff() )
 
       # Change position
       @_detectPositionClear()
 
       # Animate
-      @_animate(null, moveToPosition)
+      @_animate(moveToPosition)
 
 
     # Index and position calculation

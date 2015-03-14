@@ -23,7 +23,7 @@
 
 (function() {
   angular.module('multiGallery').directive('galleryRepeater', [
-    'GalleryRenderer', 'ItemsStorage', 'MoverHolder', 'GalleryMover', 'GalleryEvents', '$rootScope', function(GalleryRenderer, ItemsStorage, MoverHolder, GalleryMover, GalleryEvents, $rootScope) {
+    'GalleryRenderer', 'ItemsStorage', 'MoverHolder', 'GalleryMover', 'MoverTouch', 'GalleryEvents', 'Resize', '$window', '$rootScope', function(GalleryRenderer, ItemsStorage, MoverHolder, GalleryMover, MoverTouch, GalleryEvents, Resize, $window, $rootScope) {
       return {
         terminal: true,
         transclude: 'element',
@@ -31,7 +31,7 @@
         $$tlb: true,
         priority: 1000,
         link: function($scope, $element, $attr, nullController, renderFunction) {
-          var _$body, _$holder, _collectionName, _galleryIndexName, _matchResult, _repeatAttributes, _scopeItemName, gallery, holder, mover, slide_diff, start_position, storage, trigger;
+          var _$body, _$holder, _collectionName, _galleryIndexName, _matchResult, _repeatAttributes, _scopeItemName, gallery, holder, mover, resize, storage, touch, updateIndex;
           _repeatAttributes = $attr.galleryRepeater;
           _matchResult = _repeatAttributes.match(/^\s*(.+)\s+in\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/);
           _scopeItemName = _matchResult[1];
@@ -43,6 +43,8 @@
           gallery = new GalleryRenderer($scope, _scopeItemName, _$holder, renderFunction);
           holder = new MoverHolder(_$holder);
           mover = new GalleryMover(storage, gallery, holder, $scope);
+          touch = new MoverTouch(mover, holder);
+          resize = new Resize(mover, holder);
           GalleryEvents.on('move:next', function() {
             return mover.next();
           });
@@ -56,33 +58,30 @@
             return mover.animatePrev();
           });
           GalleryEvents.on('index:update', function() {
-            return $scope[_galleryIndexName] = storage.getIndex();
+            return updateIndex();
           });
           $scope.$watchCollection(_collectionName, function(items) {
             return mover.render(items);
           });
-          trigger = false;
-          start_position = 0;
-          slide_diff = 0;
-          _$holder.on('mousedown', function(e) {
-            trigger = true;
-            return start_position = e.x;
+          angular.element($window).bind('resize', function() {
+            return resize["do"]();
           });
-          _$body.on('mouseup', function() {
-            return trigger = false;
+          _$holder.on('touchstart', function(e) {
+            return touch.touchStart(e.touches[0].pageX);
           });
-          _$body.on('mousemove', function(e) {
-            var move;
-            if (!trigger) {
-              return true;
-            }
-            console.log('SLIDE', slide_diff, move);
-            move = e.x - start_position;
-            return mover.touchMove(move);
+          _$body.on('touchend', function(e) {
+            return touch.touchEnd();
           });
-          return $rootScope.setGalleryIndex = function(index) {
+          _$body.on('touchmove', function(e) {
+            return touch.touchMove(e.touches[0].pageX);
+          });
+          $rootScope.setGalleryIndex = function(index) {
             return mover.setIndex(index - 0);
           };
+          updateIndex = function() {
+            return $scope[_galleryIndexName] = storage.getIndex();
+          };
+          return updateIndex();
         }
       };
     }
@@ -436,7 +435,7 @@
   angular.module('multiGallery').service('GalleryMover', function() {
     var GalleryMover;
     return GalleryMover = (function() {
-      GalleryMover.prototype.ANIMATION_TIME = 300;
+      GalleryMover.prototype.ANIMATION_TIME = 600;
 
       GalleryMover.prototype.ANIMATION_SIDE_NEXT = 1;
 
@@ -505,6 +504,7 @@
         if (this._animation_side === this.ANIMATION_SIDE_PREV) {
           return this._stopAnimationSide();
         }
+        this._clearAnimationTime();
         this._storage.incNextBuffer();
         return this._animate();
       };
@@ -513,18 +513,22 @@
         if (this._animation_side === this.ANIMATION_SIDE_NEXT) {
           return this._stopAnimationSide();
         }
+        this._clearAnimationTime();
         this._storage.incPrevBuffer();
         return this._animate();
       };
 
-      GalleryMover.prototype.touchMove = function(move) {
-        return this._holder.setPosition(this._getPositionForMoveIndex() - move);
+      GalleryMover.prototype.forceMove = function(position) {
+        this._holder.setPosition(this._getPositionForMoveIndex() + position);
+        return this._detectPosition();
       };
 
-      GalleryMover.prototype.touchEnd = function() {};
-
-      GalleryMover.prototype._defaultAnimationTime = function() {
-        return this.ANIMATION_TIME / 1000;
+      GalleryMover.prototype.applyIndexDiff = function(index_diff) {
+        this._storage.setIndex(this._storage.getIndex() + index_diff);
+        this._storage.clearRangeBuffer();
+        this._syncMoveIndex();
+        this._rerender();
+        return this._detectPositionClear();
       };
 
       GalleryMover.prototype._stopPreviusAnimation = function() {
@@ -538,21 +542,32 @@
 
       GalleryMover.prototype._stopAnimationSide = function() {
         this._stopPreviusAnimation();
+        this._clearAnimationTime();
         this._animation_side = null;
         this._storage.clearRangeBuffer();
         this._syncMoveIndex();
         return this._rerender();
       };
 
-      GalleryMover.prototype._animate = function(time, position) {
-        if (time == null) {
-          time = this._defaultAnimationTime();
+      GalleryMover.prototype._getAnimationTime = function() {
+        var timestamp;
+        timestamp = (new Date()).getTime();
+        if (!this._animationStartTime) {
+          this._animationStartTime = timestamp;
         }
+        return this.ANIMATION_TIME - (timestamp - this._animationStartTime);
+      };
+
+      GalleryMover.prototype._clearAnimationTime = function() {
+        return this._animationStartTime = null;
+      };
+
+      GalleryMover.prototype._animate = function(position) {
         if (position == null) {
           position = this._getPositionForCurrentIndex();
         }
         this._stopPreviusAnimation();
-        return this._animation = TweenMax.to(this._holder.getElement(), time, {
+        return this._animation = TweenMax.to(this._holder.getElement(), this._getAnimationTime() / 1000, {
           left: position + 'px',
           ease: Linear.easeNone,
           onUpdate: (function(_this) {
@@ -569,6 +584,7 @@
       };
 
       GalleryMover.prototype._onCompleteAnimation = function() {
+        this._clearAnimationTime();
         this._detectPositionClear();
         this._storage.clearRangeBuffer();
         this._syncMoveIndex();
@@ -596,18 +612,17 @@
       };
 
       GalleryMover.prototype._checkFrameChange = function(changeCallback) {
-        var $current_element, display_index, moveToPosition, new_right_items_count, right_items_count;
+        var $current_element, display_index, moveToPosition, right_items_count;
         if (!this._detectPosition()) {
-          return;
+          return false;
         }
-        if ((display_index = this._holder.getDisplayIndex()) === this._getMoveIndex()) {
+        if ((display_index = this._holder.getDisplayIndex()) === this.getMoveIndex()) {
           return false;
         }
         this._stopPreviusAnimation();
         $current_element = this._renderer.getElementByIndex(display_index);
         right_items_count = this._renderer.getRightElementsCount($current_element);
         this._animationRender();
-        new_right_items_count = this._renderer.getRightElementsCount($current_element);
         if (this._animation_side === this.ANIMATION_SIDE_NEXT) {
           this._moveIndex++;
           moveToPosition = this._getPositionForCurrentIndex();
@@ -617,7 +632,7 @@
           this._holder.setPosition(this._getPositionForMoveIndex() + this._holder.getSlideDiff());
         }
         this._detectPositionClear();
-        return this._animate(null, moveToPosition);
+        return this._animate(moveToPosition);
       };
 
       GalleryMover.prototype._applyMoveIndexPosition = function() {
@@ -629,19 +644,23 @@
       };
 
       GalleryMover.prototype._getPositionForMoveIndex = function() {
-        return this._holder.__calculatePositionForIndex(this._getMoveIndex());
+        return this._holder.__calculatePositionForIndex(this.getMoveIndex());
       };
 
       GalleryMover.prototype._getPositionForCurrentIndex = function() {
-        return this._holder.__calculatePositionForIndex(this._storage.getCurrentIndexInRange());
+        return this._holder.__calculatePositionForIndex(this.getTrueMoveIndex());
+      };
+
+      GalleryMover.prototype.getTrueMoveIndex = function() {
+        return this._storage.getCurrentIndexInRange();
+      };
+
+      GalleryMover.prototype.getMoveIndex = function() {
+        return this._moveIndex;
       };
 
       GalleryMover.prototype._syncMoveIndex = function() {
-        return this._moveIndex = this._storage.getCurrentIndexInRange();
-      };
-
-      GalleryMover.prototype._getMoveIndex = function() {
-        return this._moveIndex;
+        return this._moveIndex = this.getTrueMoveIndex();
       };
 
       GalleryMover.prototype._animationRender = function() {
@@ -832,6 +851,44 @@
 }).call(this);
 
 (function() {
+  angular.module('multiGallery').service('Resize', function() {
+    var Resize;
+    return Resize = (function() {
+      Resize.prototype.mover = null;
+
+      Resize.prototype.holder = null;
+
+      Resize.prototype.resizeTimeout = 0;
+
+      Resize.prototype.resizeDelay = 500;
+
+      function Resize(mover, holder) {
+        this.mover = mover;
+        this.holder = holder;
+      }
+
+      Resize.prototype["do"] = function() {
+        clearTimeout(this.resizeTimeout);
+        return this.resizeTimeout = setTimeout(((function(_this) {
+          return function() {
+            return _this._resize();
+          };
+        })(this)), this.resizeDelay);
+      };
+
+      Resize.prototype._resize = function() {
+        this.holder.update();
+        return this.mover._rerender();
+      };
+
+      return Resize;
+
+    })();
+  });
+
+}).call(this);
+
+(function() {
   angular.module('multiGallery').service('MoverHolder', function() {
     var MoverHolder;
     return MoverHolder = (function() {
@@ -902,6 +959,56 @@
       };
 
       return MoverHolder;
+
+    })();
+  });
+
+}).call(this);
+
+(function() {
+  angular.module('multiGallery').service('MoverTouch', function() {
+    var MoverTouch;
+    return MoverTouch = (function() {
+      MoverTouch.prototype._mover = null;
+
+      MoverTouch.prototype._storage = null;
+
+      MoverTouch.prototype._holder = null;
+
+      MoverTouch.prototype.trigger = false;
+
+      MoverTouch.prototype.start_position = 0;
+
+      MoverTouch.prototype.slide_diff = 0;
+
+      function MoverTouch(mover, holder) {
+        this._mover = mover;
+        this._holder = holder;
+      }
+
+      MoverTouch.prototype.touchStart = function(position) {
+        this.trigger = true;
+        this._mover._stopPreviusAnimation();
+        return this.start_position = position;
+      };
+
+      MoverTouch.prototype.touchEnd = function() {
+        if (!this.trigger) {
+          return true;
+        }
+        this.trigger = false;
+        this.start_position = 0;
+        return this._mover.applyIndexDiff(this._holder.getDisplayIndex() - this._mover.getTrueMoveIndex());
+      };
+
+      MoverTouch.prototype.touchMove = function(position) {
+        if (!this.trigger) {
+          return true;
+        }
+        return this._mover.forceMove(position - this.start_position);
+      };
+
+      return MoverTouch;
 
     })();
   });

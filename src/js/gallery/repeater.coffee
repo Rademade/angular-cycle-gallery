@@ -46,7 +46,7 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       # Touch events
 
       _$holder.on 'touchstart', (e)-> touch.touchStart(e.touches[0].pageX)
-      _$body.on 'touchend', -> touch.touchEnd()
+      _$body.on 'touchend', (e)-> touch.touchEnd()
       _$body.on 'touchmove', (e)-> touch.touchMove(e.touches[0].pageX)
 
 
