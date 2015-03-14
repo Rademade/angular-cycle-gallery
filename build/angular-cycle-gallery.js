@@ -11,7 +11,7 @@
         link: function(scope, element, attrs, controller) {
           var action_name;
           action_name = attrs.galleryButton;
-          return element.on('click', function() {
+          return element.on('click', function(e) {
             return GalleryActions[action_name]();
           });
         }
@@ -1001,10 +1001,10 @@
         this.start_position = 0;
         position_diff = this._holder.getSlideDiff();
         this._mover.applyIndexDiff(this._holder.getDisplayIndex() - this._mover.getTrueMoveIndex());
+        first_half = Math.abs(position_diff) > this._holder.getItemWidth() / 2;
         if (first_half) {
           position_diff += this._holder.getItemWidth();
         }
-        first_half = Math.abs(position_diff) > this._holder.getItemWidth() / 2;
         this._holder.setPosition(this._holder.getCurrentPosition() + position_diff);
         return this._mover._animate();
       };

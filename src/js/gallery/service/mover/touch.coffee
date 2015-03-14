@@ -27,8 +27,8 @@ angular.module('multiGallery').service 'MoverTouch', ->
 
       @_mover.applyIndexDiff( @_holder.getDisplayIndex() - @_mover.getTrueMoveIndex() )
 
-      position_diff += @_holder.getItemWidth() if first_half
       first_half = Math.abs(position_diff) > @_holder.getItemWidth()/2
+      position_diff += @_holder.getItemWidth() if first_half
 
       @_holder.setPosition( @_holder.getCurrentPosition() + position_diff )
       @_mover._animate()

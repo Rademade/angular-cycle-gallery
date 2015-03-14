@@ -7,6 +7,6 @@ angular.module('multiGallery').directive 'galleryButton', [
 
     link: (scope, element, attrs, controller) ->
       action_name = attrs.galleryButton
-      element.on('click', -> GalleryActions[action_name]())
+      element.on 'click', (e) -> GalleryActions[action_name]()
 
 ]

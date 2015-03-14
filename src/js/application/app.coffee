@@ -13,11 +13,6 @@ app.controller 'AppController', ['$scope', ($scope) ->
     {text: 'Item 8', color: 'darkgreen'}
     {text: 'Item 9', color: 'darkblue'}
     {text: 'Item 11', color: 'darkgrey'}
-    {text: 'Item 12', color: 'darkgrey'}
-    {text: 'Item 13', color: 'darkgrey'}
-    {text: 'Item 14', color: 'darkgrey'}
-    {text: 'Item 15', color: 'darkgrey'}
-    {text: 'Item 16', color: 'darkgrey'}
   ]
 
 
