@@ -33,7 +33,7 @@ angular.module('multiGallery').service 'RenderedItems', [
         for item, i in @_items
           if item.isOutdate()
             index_for_removeing.unshift i # for reverse deleting
-            item.destroy() # todo move to rendererer
+            item.destroy() # TODO move to rendererer
 
         for i in index_for_removeing
           @_items.splice(i, 1)

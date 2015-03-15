@@ -16,7 +16,7 @@ angular.module('multiGallery').service 'MoverTouch', ->
 
     touchStart: (position)->
       @trigger = true
-      @_mover._stopPreviusAnimation() # todo fix name
+      @_mover._stopPreviusAnimation() # TODO fix name. Like a private function
       @start_position = position
 
     touchEnd: ->

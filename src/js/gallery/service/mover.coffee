@@ -1,5 +1,7 @@
 angular.module('multiGallery').service 'GalleryMover', ->
 
+  # TODO Need to extract sub components. Like animation
+
   class GalleryMover
 
     ANIMATION_TIME: 300
@@ -69,7 +71,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_detectPosition()
 
     applyIndexDiff: (index_diff)->
-      @_storage.setIndex( @_storage.getIndex() + index_diff )
+      @_storage.setIndexDiff( index_diff )
       @_storage.clearRangeBuffer()
       @_syncMoveIndex()
       @_rerender()
@@ -104,7 +106,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
     _animate: (position = @_getPositionForCurrentIndex())->
       @_stopPreviusAnimation()
-      # Todo make request animation frame animation. Remove dependencies
+      # TODO make request animation frame animation. Remove dependencies
       @_animation = TweenMax.to(@_holder.getElement(), @_getAnimationTime()/1000, {
         left: position + 'px'
         ease: Linear.easeNone
@@ -154,6 +156,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
         @_moveIndex = @_renderer.getRenderedCount() - right_items_count
         moveToPosition = @_holder.__calculatePositionForIndex( @_storage.NEAREST_ITEMS )
         @_holder.setPosition( @_getPositionForMoveIndex() + @_holder.getSlideDiff() )
+        # TODO. Animation is bad. Need fix current slide bug. We need to find displayed
 
       # Change position
       @_detectPositionClear()

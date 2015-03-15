@@ -3,10 +3,11 @@ angular.module('multiGallery').directive 'galleryButton', [
   (GalleryActions) ->
 
     restrict: 'A',
-    #todo get via class attributes galleryButton
+    scope:
+    	galleryButton: '@'
 
-    link: (scope, element, attrs, controller) ->
-      action_name = attrs.galleryButton
-      element.on 'click', (e) -> GalleryActions[action_name]()
+    link: (scope, $element) ->
+      action = scope.galleryButton
+      $element.on 'click', (e) -> GalleryActions[action]()
 
 ]

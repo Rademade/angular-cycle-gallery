@@ -36,6 +36,10 @@ angular.module('multiGallery').service 'ItemsStorage', [
         @_setItemIndex(index)
         @_counterIndex = @getIndex()
 
+      setIndexDiff: (index_diff)->
+        @_counterIndex += index_diff
+        @_setItemIndex( @getIndex() + index_diff )
+
       getIndex: ->
         @index
 
@@ -67,7 +71,7 @@ angular.module('multiGallery').service 'ItemsStorage', [
 
       _clearPrevBuffer: ->
         @_setItemIndex(@index - @prevBuffer)
-        @_counterIndex -= @nextBuffer
+        @_counterIndex -= @prevBuffer
         @prevBuffer = 0
 
       _setItemIndex: (index)->

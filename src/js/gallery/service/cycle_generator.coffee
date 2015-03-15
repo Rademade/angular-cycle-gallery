@@ -35,8 +35,7 @@ angular.module('multiGallery').service 'CycleGenerator', ->
 
     _cycleGenerate: (cycleMultiplier, toStart = false)->
       for i in [0..cycleMultiplier]
-        # todo make safe cloning
-        items = JSON.parse( JSON.stringify( @_items ) )
+        items = JSON.parse( JSON.stringify( @_items ) ) # TODO make safe cloning
         if (toStart)
           @_cycleIndex += @_items.length
           @_cycleItems = @_addUIID(items).concat( @_cycleItems )

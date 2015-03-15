@@ -1,6 +1,6 @@
 angular.module('multiGallery').service 'GalleryEvents', [ ->
 
-  #todo use native events
+  # TODO use native events
 
   _stack: {}
 
