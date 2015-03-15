@@ -19,7 +19,7 @@ angular.module('multiGallery').service 'RenderedItem', ->
       @_index
 
     isDataMatch: (data)->
-      @_data._$UUID == data._$UUID
+      @_data and data and @_data._$UUID == data._$UUID
 
     getData: ->
       @_data

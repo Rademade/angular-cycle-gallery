@@ -10,46 +10,42 @@ angular.module('multiGallery').service 'ItemsStorage', [
       index: 0
       count: 0
 
+      _counterIndex: 0
+
       nextBuffer: 0
       prevBuffer: 0
 
-      # Additional array for cycling items
       cycleMultiplier: 0
-      nextCycleItems: new CycleGenerator()
-      prevCycleItems: new CycleGenerator()
+      cycler: new CycleGenerator()
 
       setItems: (items) ->
         @count = items.length
         @items = items
-        @nextCycleItems.setItems(@items)
-        @prevCycleItems.setItems(@items)
+        @cycler.setItems(@items)
         @setIndex(0)
 
       getNearestRange: () ->
         return [] if @count == 0
-        [].concat(@getPrevRangeItems(), @getNextRangeItems())
+        @cycler.setIndex( @_counterIndex )
+        [].concat(
+          @cycler.getPrev(@NEAREST_ITEMS + @prevBuffer)
+          @cycler.getNext(@NEAREST_ITEMS + @nextBuffer + 1) # +1 is current element
+        )
+
+      setIndex: (index)->
+        @_setItemIndex(index)
+        @_counterIndex = @getIndex()
 
       getIndex: ->
         @index
 
-      getPrevRangeItems: ->
-        items_count = @NEAREST_ITEMS + @prevBuffer
-        cycle_multiplier = (((items_count + @index) / @count) | 0) + 1
-        from_index = @count * cycle_multiplier - items_count + @index
-        to_index = from_index + items_count
-        @prevCycleItems.sliceItems(from_index, to_index)
-
-      getNextRangeItems: ->
-        items_count = @NEAREST_ITEMS + @nextBuffer
-        from_index = @index
-        to_index = from_index + items_count + 1
-        @nextCycleItems.sliceItems(from_index, to_index)
-
       nextIndex: ->
-        @setIndex(@index+1)
+        @_setItemIndex(@index+1)
+        @_counterIndex++
 
       prevIndex: ->
-        @setIndex(@index-1)
+        @_setItemIndex(@index-1)
+        @_counterIndex--
 
       getCurrentIndexInRange: ->
         @NEAREST_ITEMS - @prevBuffer + @nextBuffer
@@ -65,23 +61,25 @@ angular.module('multiGallery').service 'ItemsStorage', [
       getPrevBuffer: -> @prevBuffer
 
       _clearNextBuffer: ->
-        @setIndex(@index + @nextBuffer)
+        @_setItemIndex(@index + @nextBuffer)
+        @_counterIndex += @nextBuffer
         @nextBuffer = 0
 
       _clearPrevBuffer: ->
-        @setIndex(@index - @prevBuffer)
+        @_setItemIndex(@index - @prevBuffer)
+        @_counterIndex -= @nextBuffer
         @prevBuffer = 0
 
-      setIndex: (index)->
-        fixed_index = @_fixIndex(index)
-        unless @index == fixed_index
-          @index = fixed_index
+      _setItemIndex: (index)->
+        index = @_fixItemIndex(index)
+        unless @index == index
+          @index = index
           GalleryEvents.do('index:update')
 
-      _fixIndex: (index)->
+      _fixItemIndex: (index)->
         index = index%@count if index >= @count and @count > 0
         index = @count + index if index < 0
-        index = @_fixIndex(index) unless 0 <= index < @count or @count == 0
+        index = @_fixItemIndex(index) unless 0 <= index < @count or @count == 0
         index
 
 ]
