@@ -1,9 +1,9 @@
 # Angular-cycle-gallery 
 
 AngularJS responsive gallery with loop items listing. Support:
-1. Next / Prev buttons
-2. Animation for next and previous items 
-3. Touch scrolling support. **Amazing!**
+- Next / Prev buttons
+- Animation for next and previous items 
+- Touch scrolling support. **Amazing!**
 
 #### Live demo -> [Try it now](http://angular-cycle-gallery.rademade.com)
 
@@ -51,7 +51,6 @@ app.controller 'AppController', ['$scope', ($scope) ->
 ### Styles
 
 Copy style to your project or use build of bower components
-
- 1. [Link for styles](https://github.com/Rademade/angular-cycle-gallery/blob/master/src/sass/import.sass)
- 2. Path for bower build styles: */build/stylesheets.min.css*
+- [Link for styles](https://github.com/Rademade/angular-cycle-gallery/blob/master/src/sass/import.sass)
+- Path for bower build styles: */build/stylesheets.min.css*
 
