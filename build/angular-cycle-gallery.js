@@ -8,11 +8,14 @@
     'GalleryActions', function(GalleryActions) {
       return {
         restrict: 'A',
-        link: function(scope, element, attrs, controller) {
-          var action_name;
-          action_name = attrs.galleryButton;
-          return element.on('click', function(e) {
-            return GalleryActions[action_name]();
+        scope: {
+          galleryButton: '@'
+        },
+        link: function(scope, $element) {
+          var action;
+          action = scope.galleryButton;
+          return $element.on('click', function(e) {
+            return GalleryActions[action]();
           });
         }
       };
@@ -122,28 +125,57 @@
 
       CycleGenerator.prototype._items = [];
 
+      CycleGenerator.prototype._index = null;
+
+      CycleGenerator.prototype._cycleIndex = 0;
+
       CycleGenerator.prototype._cycleItems = [];
 
       CycleGenerator.prototype.setItems = function(items) {
         this._items = items;
         this._count = items.length;
-        this._cycleItems = [];
-        return this._cycleGenerate(1);
+        return this._cycleItems = [];
       };
 
-      CycleGenerator.prototype.sliceItems = function(from, to) {
+      CycleGenerator.prototype.setIndex = function(index) {
+        return this._index = index;
+      };
+
+      CycleGenerator.prototype.getPrev = function(count) {
+        var from, to;
+        to = this._cycleIndex + this._index;
+        from = to - count;
+        if (from >= 0) {
+          return this._cycleItems.slice(from, to);
+        }
+        this._cycleGenerate(Math.ceil(from / this._count) * -1, true);
+        return this.getPrev(count);
+      };
+
+      CycleGenerator.prototype.getNext = function(count) {
+        var from, to;
+        from = this._cycleIndex + this._index;
+        to = from + count;
         if (to > this._cycleItems.length - 1) {
-          this._cycleGenerate(Math.ceil(to / this._count));
+          this._cycleGenerate(Math.ceil(to / this._count), false);
         }
         return this._cycleItems.slice(from, to);
       };
 
-      CycleGenerator.prototype._cycleGenerate = function(cycleMultiplier) {
+      CycleGenerator.prototype._cycleGenerate = function(cycleMultiplier, toStart) {
         var i, items, j, ref, results;
+        if (toStart == null) {
+          toStart = false;
+        }
         results = [];
         for (i = j = 0, ref = cycleMultiplier; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
           items = JSON.parse(JSON.stringify(this._items));
-          results.push(this._cycleItems = this._cycleItems.concat(this._addUIID(items)));
+          if (toStart) {
+            this._cycleIndex += this._items.length;
+            results.push(this._cycleItems = this._addUIID(items).concat(this._cycleItems));
+          } else {
+            results.push(this._cycleItems = this._cycleItems.concat(this._addUIID(items)));
+          }
         }
         return results;
       };
@@ -312,21 +344,20 @@
 
         ItemsStorage.prototype.count = 0;
 
+        ItemsStorage.prototype._counterIndex = 0;
+
         ItemsStorage.prototype.nextBuffer = 0;
 
         ItemsStorage.prototype.prevBuffer = 0;
 
         ItemsStorage.prototype.cycleMultiplier = 0;
 
-        ItemsStorage.prototype.nextCycleItems = new CycleGenerator();
-
-        ItemsStorage.prototype.prevCycleItems = new CycleGenerator();
+        ItemsStorage.prototype.cycler = new CycleGenerator();
 
         ItemsStorage.prototype.setItems = function(items) {
           this.count = items.length;
           this.items = items;
-          this.nextCycleItems.setItems(this.items);
-          this.prevCycleItems.setItems(this.items);
+          this.cycler.setItems(this.items);
           return this.setIndex(0);
         };
 
@@ -334,40 +365,36 @@
           if (this.count === 0) {
             return [];
           }
-          return [].concat(this.getPrevRangeItems(), this.getNextRangeItems());
+          this.cycler.setIndex(this._counterIndex);
+          return [].concat(this.cycler.getPrev(this.NEAREST_ITEMS + this.prevBuffer), this.cycler.getNext(this.NEAREST_ITEMS + this.nextBuffer + 1));
+        };
+
+        ItemsStorage.prototype.setIndex = function(index) {
+          this._setItemIndex(index);
+          return this._counterIndex = this.getIndex();
+        };
+
+        ItemsStorage.prototype.setIndexDiff = function(index_diff) {
+          this._counterIndex += index_diff;
+          return this._setItemIndex(this.getIndex() + index_diff);
         };
 
         ItemsStorage.prototype.getIndex = function() {
           return this.index;
         };
 
-        ItemsStorage.prototype.getPrevRangeItems = function() {
-          var cycle_multiplier, from_index, items_count, to_index;
-          items_count = this.NEAREST_ITEMS + this.prevBuffer;
-          cycle_multiplier = (((items_count + this.index) / this.count) | 0) + 1;
-          from_index = this.count * cycle_multiplier - items_count + this.index;
-          to_index = from_index + items_count;
-          return this.prevCycleItems.sliceItems(from_index, to_index);
-        };
-
-        ItemsStorage.prototype.getNextRangeItems = function() {
-          var from_index, items_count, to_index;
-          items_count = this.NEAREST_ITEMS + this.nextBuffer;
-          from_index = this.index;
-          to_index = from_index + items_count + 1;
-          return this.nextCycleItems.sliceItems(from_index, to_index);
-        };
-
         ItemsStorage.prototype.nextIndex = function() {
-          return this.setIndex(this.index + 1);
+          this._setItemIndex(this.index + 1);
+          return this._counterIndex++;
         };
 
         ItemsStorage.prototype.prevIndex = function() {
-          return this.setIndex(this.index - 1);
+          this._setItemIndex(this.index - 1);
+          return this._counterIndex--;
         };
 
         ItemsStorage.prototype.getCurrentIndexInRange = function() {
-          return this.NEAREST_ITEMS - this.prevBuffer + this.nextBuffer;
+          return this.NEAREST_ITEMS + this.nextBuffer;
         };
 
         ItemsStorage.prototype.clearRangeBuffer = function() {
@@ -392,25 +419,26 @@
         };
 
         ItemsStorage.prototype._clearNextBuffer = function() {
-          this.setIndex(this.index + this.nextBuffer);
+          this._setItemIndex(this.index + this.nextBuffer);
+          this._counterIndex += this.nextBuffer;
           return this.nextBuffer = 0;
         };
 
         ItemsStorage.prototype._clearPrevBuffer = function() {
-          this.setIndex(this.index - this.prevBuffer);
+          this._setItemIndex(this.index - this.prevBuffer);
+          this._counterIndex -= this.prevBuffer;
           return this.prevBuffer = 0;
         };
 
-        ItemsStorage.prototype.setIndex = function(index) {
-          var fixed_index;
-          fixed_index = this._fixIndex(index);
-          if (this.index !== fixed_index) {
-            this.index = fixed_index;
+        ItemsStorage.prototype._setItemIndex = function(index) {
+          index = this._fixItemIndex(index);
+          if (this.index !== index) {
+            this.index = index;
             return GalleryEvents["do"]('index:update');
           }
         };
 
-        ItemsStorage.prototype._fixIndex = function(index) {
+        ItemsStorage.prototype._fixItemIndex = function(index) {
           if (index >= this.count && this.count > 0) {
             index = index % this.count;
           }
@@ -418,7 +446,7 @@
             index = this.count + index;
           }
           if (!((0 <= index && index < this.count) || this.count === 0)) {
-            index = this._fixIndex(index);
+            index = this._fixItemIndex(index);
           }
           return index;
         };
@@ -455,7 +483,9 @@
 
       GalleryMover.prototype._itemWidth = 0;
 
-      GalleryMover.prototype._moveIndex = 0;
+      GalleryMover.prototype._necessaryIndex = 0;
+
+      GalleryMover.prototype._displayIndex = 0;
 
       function GalleryMover(storage, renderer, holder, $scope) {
         this._storage = storage;
@@ -468,8 +498,8 @@
         this._storage.setItems(items);
         this._renderer.render(this._storage.getNearestRange());
         this._holder.update();
-        this._syncMoveIndex();
-        return this._applyCurrentIndexPosition();
+        this._syncIndexes();
+        return this._applyPositionForNecessaryIndex();
       };
 
       GalleryMover.prototype.setIndex = function(index) {
@@ -477,7 +507,7 @@
           return this._stopAnimationSide();
         }
         this._storage.setIndex(index);
-        this._syncMoveIndex();
+        this._syncIndexes();
         this._stopPreviusAnimation();
         return this._rerender();
       };
@@ -487,7 +517,7 @@
           return this._stopAnimationSide();
         }
         this._storage.nextIndex();
-        this._syncMoveIndex();
+        this._syncIndexes();
         return this._rerender();
       };
 
@@ -496,37 +526,37 @@
           return this._stopAnimationSide();
         }
         this._storage.prevIndex();
-        this._syncMoveIndex();
+        this._syncIndexes();
         return this._rerender();
       };
 
       GalleryMover.prototype.animateNext = function() {
-        if (this._animation_side === this.ANIMATION_SIDE_PREV) {
-          return this._stopAnimationSide();
-        }
         this._clearAnimationTime();
         this._storage.incNextBuffer();
+        ++this._necessaryIndex;
         return this._animate();
       };
 
       GalleryMover.prototype.animatePrev = function() {
-        if (this._animation_side === this.ANIMATION_SIDE_NEXT) {
-          return this._stopAnimationSide();
-        }
         this._clearAnimationTime();
         this._storage.incPrevBuffer();
+        --this._necessaryIndex;
         return this._animate();
       };
 
+      GalleryMover.prototype.getAnimationSide = function() {
+        return this._animation_side;
+      };
+
       GalleryMover.prototype.forceMove = function(position) {
-        this._holder.setPosition(this._getPositionForMoveIndex() + position);
+        this._holder.setPosition(this._getPositionForDisplayIndex() + position);
         return this._detectPosition();
       };
 
       GalleryMover.prototype.applyIndexDiff = function(index_diff) {
-        this._storage.setIndex(this._storage.getIndex() + index_diff);
+        this._storage.setIndexDiff(index_diff);
         this._storage.clearRangeBuffer();
-        this._syncMoveIndex();
+        this._syncIndexes();
         this._rerender();
         return this._detectPositionClear();
       };
@@ -536,8 +566,9 @@
           this._animation.pause();
         }
         if (this._animation) {
-          return this._animation.kill();
+          this._animation.kill();
         }
+        return this._animation = null;
       };
 
       GalleryMover.prototype._stopAnimationSide = function() {
@@ -545,7 +576,7 @@
         this._clearAnimationTime();
         this._animation_side = null;
         this._storage.clearRangeBuffer();
-        this._syncMoveIndex();
+        this._syncIndexes();
         return this._rerender();
       };
 
@@ -564,7 +595,7 @@
 
       GalleryMover.prototype._animate = function(position) {
         if (position == null) {
-          position = this._getPositionForCurrentIndex();
+          position = this._getPositionForNecessaryIndex();
         }
         this._stopPreviusAnimation();
         return this._animation = TweenMax.to(this._holder.getElement(), this._getAnimationTime() / 1000, {
@@ -587,7 +618,7 @@
         this._clearAnimationTime();
         this._detectPositionClear();
         this._storage.clearRangeBuffer();
-        this._syncMoveIndex();
+        this._syncIndexes();
         return this._rerender();
       };
 
@@ -611,56 +642,66 @@
         return this._animation_side = null;
       };
 
-      GalleryMover.prototype._checkFrameChange = function(changeCallback) {
-        var $current_element, display_index, moveToPosition, right_items_count;
+      GalleryMover.prototype._checkFrameChange = function() {
+        var $current_element, animation_display_index, right_items_count;
         if (!this._detectPosition()) {
           return false;
         }
-        if ((display_index = this._holder.getDisplayIndex()) === this.getMoveIndex()) {
+        if ((animation_display_index = this._holder.getDisplayIndex()) === this.getDisplayIndex()) {
           return false;
         }
         this._stopPreviusAnimation();
-        $current_element = this._renderer.getElementByIndex(display_index);
+        $current_element = this._renderer.getElementByIndex(animation_display_index);
         right_items_count = this._renderer.getRightElementsCount($current_element);
         this._animationRender();
         if (this._animation_side === this.ANIMATION_SIDE_NEXT) {
-          this._moveIndex++;
-          moveToPosition = this._getPositionForCurrentIndex();
+          this._displayIndex++;
         } else {
-          this._moveIndex = this._renderer.getRenderedCount() - right_items_count;
-          moveToPosition = this._holder.__calculatePositionForIndex(this._storage.NEAREST_ITEMS);
-          this._holder.setPosition(this._getPositionForMoveIndex() + this._holder.getSlideDiff());
+          this._displayIndex = this._renderer.getRenderedCount() - right_items_count;
+          this._holder.setPosition(this._getPositionForDisplayIndex() + this._holder.getSlideDiff());
+          this._necessaryIndex = this.getTrueIndex();
         }
         this._detectPositionClear();
-        return this._animate(moveToPosition);
+        return this._animate();
       };
 
-      GalleryMover.prototype._applyMoveIndexPosition = function() {
-        return this._holder.setPosition(this._getPositionForMoveIndex());
+      GalleryMover.prototype._applyPositionForNecessaryIndex = function() {
+        return this._holder.setPosition(this._getPositionForNecessaryIndex());
       };
 
-      GalleryMover.prototype._applyCurrentIndexPosition = function() {
-        return this._holder.setPosition(this._getPositionForCurrentIndex());
+      GalleryMover.prototype._getPositionForDisplayIndex = function() {
+        return this._holder.__calculatePositionForIndex(this.getDisplayIndex());
       };
 
-      GalleryMover.prototype._getPositionForMoveIndex = function() {
-        return this._holder.__calculatePositionForIndex(this.getMoveIndex());
+      GalleryMover.prototype._getPositionForNecessaryIndex = function() {
+        return this._holder.__calculatePositionForIndex(this.getNecessaryIndex());
       };
 
-      GalleryMover.prototype._getPositionForCurrentIndex = function() {
-        return this._holder.__calculatePositionForIndex(this.getTrueMoveIndex());
-      };
-
-      GalleryMover.prototype.getTrueMoveIndex = function() {
+      GalleryMover.prototype.getTrueIndex = function() {
         return this._storage.getCurrentIndexInRange();
       };
 
-      GalleryMover.prototype.getMoveIndex = function() {
-        return this._moveIndex;
+      GalleryMover.prototype.getDisplayIndex = function() {
+        return this._displayIndex;
       };
 
-      GalleryMover.prototype._syncMoveIndex = function() {
-        return this._moveIndex = this.getTrueMoveIndex();
+      GalleryMover.prototype.getNecessaryIndex = function() {
+        return this._necessaryIndex;
+      };
+
+      GalleryMover.prototype._syncIndexes = function() {
+        this._necessaryIndex = this.getTrueIndex();
+        return this._displayIndex = this.getTrueIndex();
+      };
+
+      GalleryMover.prototype.getUseableDiff = function() {
+        var is_half, position_diff;
+        position_diff = this._holder.getSlideDiff();
+        is_half = Math.abs(position_diff) > this._holder.getItemWidth() / 2;
+        if (is_half) {
+          position_diff += this._holder.getItemWidth();
+        }
+        return position_diff;
       };
 
       GalleryMover.prototype._animationRender = function() {
@@ -670,7 +711,7 @@
 
       GalleryMover.prototype._rerender = function() {
         this._renderer.render(this._storage.getNearestRange());
-        this._applyMoveIndexPosition();
+        this._applyPositionForNecessaryIndex();
         if (!this._$scope.$$phase) {
           return this._$scope.$apply();
         }
@@ -710,7 +751,7 @@
       };
 
       RenderedItem.prototype.isDataMatch = function(data) {
-        return this._data._$UUID === data._$UUID;
+        return this._data && data && this._data._$UUID === data._$UUID;
       };
 
       RenderedItem.prototype.getData = function() {
@@ -975,11 +1016,19 @@
 
       MoverTouch.prototype._holder = null;
 
-      MoverTouch.prototype.trigger = false;
+      MoverTouch.prototype._trigger = false;
 
-      MoverTouch.prototype.start_position = 0;
+      MoverTouch.prototype._start_position = 0;
 
-      MoverTouch.prototype.slide_diff = 0;
+      MoverTouch.prototype._last_position = 0;
+
+      MoverTouch.prototype._last_track_time = null;
+
+      MoverTouch.prototype._last_track_position = null;
+
+      MoverTouch.prototype.TRACK_TIME = 150;
+
+      MoverTouch.prototype.MIN_POSITION_CHANGE = 30;
 
       function MoverTouch(mover, holder) {
         this._mover = mover;
@@ -987,33 +1036,96 @@
       }
 
       MoverTouch.prototype.touchStart = function(position) {
-        this.trigger = true;
+        this._trigger = true;
         this._mover._stopPreviusAnimation();
-        return this.start_position = position;
-      };
-
-      MoverTouch.prototype.touchEnd = function() {
-        var first_half, position_diff;
-        if (!this.trigger) {
-          return true;
-        }
-        this.trigger = false;
-        this.start_position = 0;
-        position_diff = this._holder.getSlideDiff();
-        this._mover.applyIndexDiff(this._holder.getDisplayIndex() - this._mover.getTrueMoveIndex());
-        first_half = Math.abs(position_diff) > this._holder.getItemWidth() / 2;
-        if (first_half) {
-          position_diff += this._holder.getItemWidth();
-        }
-        this._holder.setPosition(this._holder.getCurrentPosition() + position_diff);
-        return this._mover._animate();
+        this._start_position = position - this._mover.getUseableDiff();
+        this._setPosition(0);
+        this._startSwipeDetecting();
+        return this._moveTrackingReload();
       };
 
       MoverTouch.prototype.touchMove = function(position) {
-        if (!this.trigger) {
+        if (!this._trigger) {
           return true;
         }
-        return this._mover.forceMove(position - this.start_position);
+        this._setPosition(position - this._start_position);
+        this._mover.forceMove(this._getPosition());
+        this._mover._detectPosition();
+        return this._moveTracking();
+      };
+
+      MoverTouch.prototype.touchEnd = function() {
+        var slides_diff;
+        if (!this._trigger) {
+          return true;
+        }
+        this._trigger = false;
+        slides_diff = this._holder.getDisplayIndex() - this._mover.getTrueIndex();
+        if (slides_diff !== 0) {
+          this._rerenderOnIndexDiff(slides_diff);
+        } else {
+          this._moveTracking(true);
+          if (this._isSwipeReady()) {
+            this._swipeChange();
+          }
+        }
+        this._mover._detectPositionClear();
+        return this._mover._animate();
+      };
+
+      MoverTouch.prototype._rerenderOnIndexDiff = function(slides_diff) {
+        var current_position_diff;
+        current_position_diff = this._mover.getUseableDiff();
+        this._mover.applyIndexDiff(slides_diff);
+        return this._holder.setPosition(this._holder.getCurrentPosition() + current_position_diff);
+      };
+
+      MoverTouch.prototype._startSwipeDetecting = function() {
+        return this._force_swipe = false;
+      };
+
+      MoverTouch.prototype._isSwipeReady = function() {
+        return this._force_swipe;
+      };
+
+      MoverTouch.prototype._setPosition = function(position) {
+        return this._last_position = position;
+      };
+
+      MoverTouch.prototype._getPosition = function() {
+        return this._last_position;
+      };
+
+      MoverTouch.prototype._moveTrackingReload = function() {
+        this._last_track_time = (new Date()).getTime();
+        return this._last_track_position = this._getPosition();
+      };
+
+      MoverTouch.prototype._moveTracking = function(force) {
+        var force_check_conditions, track_timer_ready;
+        if (force == null) {
+          force = false;
+        }
+        track_timer_ready = (new Date()).getTime() - this._last_track_time > this.TRACK_TIME;
+        force_check_conditions = force && !this._force_swipe;
+        if (track_timer_ready || force_check_conditions) {
+          this._force_swipe = this._checkForForceSwipe();
+          return this._moveTrackingReload();
+        }
+      };
+
+      MoverTouch.prototype._checkForForceSwipe = function() {
+        var position_diff;
+        position_diff = this._last_track_position - this._getPosition();
+        return Math.abs(position_diff) > this.MIN_POSITION_CHANGE;
+      };
+
+      MoverTouch.prototype._swipeChange = function() {
+        if (this._mover.getAnimationSide() === this._mover.ANIMATION_SIDE_NEXT) {
+          return this._mover.animateNext();
+        } else {
+          return this._mover.animatePrev();
+        }
       };
 
       return MoverTouch;
