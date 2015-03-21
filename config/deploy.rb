@@ -45,19 +45,9 @@ namespace :deploy do
     end
   end
 
-  task 'app:restart' do
-    on roles(:web) do
-      within current_path do
-        execute "kill $(ps aux | grep 'angular-cycle-gallery.*server.js' | awk '{print $2}')"
-        execute "cd #{current_path} && node_modules/.bin/forever start server.js #{PORT} >> /dev/null 2>&1"
-      end
-    end
-  end
-
   after :updated,   'deploy:npm:install'
   after :finishing, 'deploy:bower:install'
   after :finishing, 'deploy:gulp:install'
-  after :finishing, 'deploy:app:restart'
   after :finishing, 'deploy:cleanup'
 
 end
