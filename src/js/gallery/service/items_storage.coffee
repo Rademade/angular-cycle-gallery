@@ -1,10 +1,10 @@
 angular.module('multiGallery').service 'ItemsStorage', [
-  'CycleGenerator', 'GalleryEvents'
-  (CycleGenerator, GalleryEvents)->
+  'CycleGenerator', 'GalleryEvents', 'GalleryConfig'
+  (CycleGenerator, GalleryEvents, GalleryConfig)->
 
     class ItemsStorage
 
-      NEAREST_ITEMS: 2
+      _NEAREST_ITEMS: null
 
       items: []
       index: 0
@@ -18,6 +18,9 @@ angular.module('multiGallery').service 'ItemsStorage', [
       cycleMultiplier: 0
       cycler: new CycleGenerator()
 
+      constructor: ()->
+        @_NEAREST_ITEMS = GalleryConfig.getBuffer()
+
       setItems: (items) ->
         @count = items.length
         @items = items
@@ -28,8 +31,8 @@ angular.module('multiGallery').service 'ItemsStorage', [
         return [] if @count == 0
         @cycler.setIndex( @_counterIndex )
         [].concat(
-          @cycler.getPrev(@NEAREST_ITEMS + @prevBuffer)
-          @cycler.getNext(@NEAREST_ITEMS + @nextBuffer + 1) # +1 is current element
+          @cycler.getPrev(@_NEAREST_ITEMS + @prevBuffer)
+          @cycler.getNext(@_NEAREST_ITEMS + @nextBuffer + 1) # +1 is current element
         )
 
       setIndex: (index)->
@@ -52,7 +55,7 @@ angular.module('multiGallery').service 'ItemsStorage', [
         @_counterIndex--
 
       getCurrentIndexInRange: ->
-        @NEAREST_ITEMS + @nextBuffer
+        @_NEAREST_ITEMS + @nextBuffer
 
       clearRangeBuffer: ->
         @_clearNextBuffer()

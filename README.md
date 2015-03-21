@@ -13,7 +13,7 @@ AngularJS responsive gallery with loop items listing. Support:
 ### Template example
 
 ```slim
-  div.gallery-wrapper(gallery)
+  div.gallery-wrapper(gallery-config-buffer="2")
       div.gallery-slider
           div.gallery-item(gallery-repeater="item in gallery")
               div.gallery-item-content() {{item.text}}
