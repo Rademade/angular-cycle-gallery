@@ -1,6 +1,6 @@
 gulp              = require 'gulp'
 md5               = require 'gulp-md5'
-rimraf            = require 'rimraf'
+del               = require 'del'
 
 
 module.exports =
@@ -21,4 +21,4 @@ module.exports =
       .on 'end', => @removeFile(full_source_path, deferred)
 
   removeFile: (file_path, deferred) ->
-    rimraf(file_path, -> deferred.resolve())
+    del([file_path], -> deferred.resolve())
