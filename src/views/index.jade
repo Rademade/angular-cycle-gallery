@@ -12,7 +12,6 @@ html(ng-app="app")
                 div.gallery-item(gallery-repeater="item in gallery" ng-style="{'background-color':item.color}")
                     div.gallery-item-content()
                         h1() {{item.text}}
-                        h3() {{item._$UUID}}
 
             button.action-button.next(gallery-button="next") next
             button.action-button.prev(gallery-button="prev") prev
