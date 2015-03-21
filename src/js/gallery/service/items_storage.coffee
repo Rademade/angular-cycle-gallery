@@ -52,7 +52,7 @@ angular.module('multiGallery').service 'ItemsStorage', [
         @_counterIndex--
 
       getCurrentIndexInRange: ->
-        @NEAREST_ITEMS - @prevBuffer + @nextBuffer
+        @NEAREST_ITEMS + @nextBuffer
 
       clearRangeBuffer: ->
         @_clearNextBuffer()

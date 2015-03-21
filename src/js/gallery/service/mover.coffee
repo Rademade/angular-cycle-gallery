@@ -1,6 +1,6 @@
 angular.module('multiGallery').service 'GalleryMover', ->
 
-  # TODO Need to extract sub components. Like animation
+  # TODO Need to extract sub components. Like animation and animate block
 
   class GalleryMover
 
@@ -18,7 +18,8 @@ angular.module('multiGallery').service 'GalleryMover', ->
     _checked_position: null
 
     _itemWidth: 0
-    _moveIndex: 0
+    _necessaryIndex: 0
+    _displayIndex: 0
 
     # Public methods
 
@@ -32,48 +33,50 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_storage.setItems(items)
       @_renderer.render( @_storage.getNearestRange() )
       @_holder.update()
-      @_syncMoveIndex()
-      @_applyCurrentIndexPosition()
+      @_syncIndexes()
+      @_applyPositionForNecessaryIndex()
 
     setIndex: (index)->
       return @_stopAnimationSide() if @_animation_side
       @_storage.setIndex(index)
-      @_syncMoveIndex()
+      @_syncIndexes()
       @_stopPreviusAnimation()
       @_rerender()
 
     next: ->
       return @_stopAnimationSide() if @_animation_side
       @_storage.nextIndex()
-      @_syncMoveIndex()
+      @_syncIndexes()
       @_rerender()
 
     prev: ->
       return @_stopAnimationSide() if @_animation_side
       @_storage.prevIndex()
-      @_syncMoveIndex()
+      @_syncIndexes()
       @_rerender()
 
     animateNext: ->
-      return @_stopAnimationSide() if @_animation_side == @ANIMATION_SIDE_PREV
       @_clearAnimationTime()
       @_storage.incNextBuffer()
+      ++@_necessaryIndex
       @_animate()
 
     animatePrev: ->
-      return @_stopAnimationSide() if @_animation_side == @ANIMATION_SIDE_NEXT
       @_clearAnimationTime()
       @_storage.incPrevBuffer()
+      --@_necessaryIndex
       @_animate()
 
+    getAnimationSide: -> @_animation_side
+
     forceMove: (position)->
-      @_holder.setPosition( @_getPositionForMoveIndex() + position )
+      @_holder.setPosition( @_getPositionForDisplayIndex() + position )
       @_detectPosition()
 
     applyIndexDiff: (index_diff)->
       @_storage.setIndexDiff( index_diff )
       @_storage.clearRangeBuffer()
-      @_syncMoveIndex()
+      @_syncIndexes()
       @_rerender()
       @_detectPositionClear()
 
@@ -83,13 +86,14 @@ angular.module('multiGallery').service 'GalleryMover', ->
     _stopPreviusAnimation: ->
       @_animation.pause() if @_animation
       @_animation.kill() if @_animation
+      @_animation = null
 
     _stopAnimationSide: ->
       @_stopPreviusAnimation()
       @_clearAnimationTime()
       @_animation_side = null
       @_storage.clearRangeBuffer()
-      @_syncMoveIndex()
+      @_syncIndexes()
       @_rerender()
 
     # Animation time
@@ -104,7 +108,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
     # Animation block
 
-    _animate: (position = @_getPositionForCurrentIndex())->
+    _animate: (position = @_getPositionForNecessaryIndex())->
       @_stopPreviusAnimation()
       # TODO make request animation frame animation. Remove dependencies
       @_animation = TweenMax.to(@_holder.getElement(), @_getAnimationTime()/1000, {
@@ -118,7 +122,7 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_clearAnimationTime()
       @_detectPositionClear()
       @_storage.clearRangeBuffer()
-      @_syncMoveIndex()
+      @_syncIndexes()
       @_rerender()
 
     _detectPosition: ->
@@ -135,14 +139,14 @@ angular.module('multiGallery').service 'GalleryMover', ->
       @_holder.clearPositionLock()
       @_animation_side = null
 
-    _checkFrameChange: (changeCallback)->
+    _checkFrameChange: ->
       return false unless @_detectPosition()
-      return false if (display_index = @_holder.getDisplayIndex()) == @getMoveIndex()
+      return false if (animation_display_index = @_holder.getDisplayIndex()) == @getDisplayIndex()
 
       @_stopPreviusAnimation()
 
       # Positions
-      $current_element = @_renderer.getElementByIndex(display_index)
+      $current_element = @_renderer.getElementByIndex(animation_display_index)
       right_items_count = @_renderer.getRightElementsCount($current_element ) # For prev animation it not change
 
       # ReRender new elements
@@ -150,33 +154,39 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
       # Change current index
       if @_animation_side == @ANIMATION_SIDE_NEXT
-        @_moveIndex++
-        moveToPosition = @_getPositionForCurrentIndex()
+        @_displayIndex++
       else
-        @_moveIndex = @_renderer.getRenderedCount() - right_items_count
-        moveToPosition = @_holder.__calculatePositionForIndex( @_storage.NEAREST_ITEMS )
-        @_holder.setPosition( @_getPositionForMoveIndex() + @_holder.getSlideDiff() )
-        # TODO. Animation is bad. Need fix current slide bug. We need to find displayed
+        @_displayIndex = @_renderer.getRenderedCount() - right_items_count
+        @_holder.setPosition( @_getPositionForDisplayIndex() + @_holder.getSlideDiff() )
+        @_necessaryIndex = @getTrueIndex() # After rerender, update index
 
       # Change position
       @_detectPositionClear()
 
       # Animate
-      @_animate(moveToPosition)
+      @_animate()
 
 
     # Index and position calculation
 
-    _applyMoveIndexPosition: -> @_holder.setPosition( @_getPositionForMoveIndex() )
-    _applyCurrentIndexPosition: -> @_holder.setPosition( @_getPositionForCurrentIndex() )
+    _applyPositionForNecessaryIndex: -> @_holder.setPosition( @_getPositionForNecessaryIndex() )
 
-    _getPositionForMoveIndex: -> @_holder.__calculatePositionForIndex(@getMoveIndex())
-    _getPositionForCurrentIndex: -> @_holder.__calculatePositionForIndex(@getTrueMoveIndex())
+    _getPositionForDisplayIndex: -> @_holder.__calculatePositionForIndex( @getDisplayIndex() )
+    _getPositionForNecessaryIndex: -> @_holder.__calculatePositionForIndex( @getNecessaryIndex() )
 
-    getTrueMoveIndex: -> @_storage.getCurrentIndexInRange()
-    getMoveIndex: -> @_moveIndex
-    _syncMoveIndex: ->  @_moveIndex = @getTrueMoveIndex()
+    getTrueIndex: -> @_storage.getCurrentIndexInRange()
+    getDisplayIndex: -> @_displayIndex
+    getNecessaryIndex: -> @_necessaryIndex
 
+    _syncIndexes: -> 
+      @_necessaryIndex = @getTrueIndex()
+      @_displayIndex = @getTrueIndex()
+
+    getUseableDiff: ->
+      position_diff = @_holder.getSlideDiff()
+      is_half = Math.abs(position_diff) > @_holder.getItemWidth()/2
+      position_diff += @_holder.getItemWidth() if is_half # Check for first part of slide
+      position_diff
 
     # Render function
 
@@ -186,5 +196,5 @@ angular.module('multiGallery').service 'GalleryMover', ->
 
     _rerender: ->
       @_renderer.render( @_storage.getNearestRange() )
-      @_applyMoveIndexPosition()
+      @_applyPositionForNecessaryIndex()
       @_$scope.$apply() unless @_$scope.$$phase
