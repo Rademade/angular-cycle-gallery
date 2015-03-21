@@ -13,5 +13,4 @@ deployment:
   production:
     branch: master
     commands:
-      - bundle exec cap chatrulez deploy
-      - bundle exec cap cafeclub deploy
+      - bundle exec cap production deploy

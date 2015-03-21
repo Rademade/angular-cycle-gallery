@@ -1,6 +1,8 @@
 {
-  "name": "slider",
-  "version": "1.0.0",
+  "name": "angular-cycle-gallery-builder",
+  "description": "Build project for Angular Cycle Gallery",
+  "version": "0.0.1",
+  "main": "gulpfile.js",
   "dependencies": {
     "bower": "^1.3.12",
     "coffee-script": "^1.8.0",
@@ -26,5 +28,21 @@
     "q": "^1.1.2",
     "rimraf": "^2.2.8",
     "stream-series": "^0.1.1"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "install": "",
+    "test": "node test/index.js",
+    "start": "node server.js"
+  },
+  "author": "Vladislav Melyanitskiy <co@rademade.com>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Rademade/angular-cycle-gallery.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Rademade/angular-cycle-gallery/issues"
+  },
+  "homepage": "https://github.com/Rademade/angular-cycle-gallery"
 }
