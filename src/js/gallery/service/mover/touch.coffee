@@ -25,9 +25,8 @@ angular.module('multiGallery').service 'MoverTouch', ->
       @_trigger = true
       @_mover._stopPreviusAnimation() # TODO fix name. Like a private function
       @_start_position = position - @_mover.getUseableDiff()
-
       @_setPosition(0)
-
+      # Swipe start logick
       @_startSwipeDetecting()
       @_moveTrackingReload()
 
@@ -44,11 +43,11 @@ angular.module('multiGallery').service 'MoverTouch', ->
 
       slides_diff = @_holder.getDisplayIndex() - @_mover.getTrueIndex()
 
-      unless slides_diff == 0
-        @_rerenderOnIndexDiff(slides_diff)
-      else
+      if slides_diff == 0
         @_moveTracking(yes)
         @_swipeChange() if @_isSwipeReady()
+      else
+        @_rerenderOnIndexDiff(slides_diff)
 
       @_mover._detectPositionClear()
       @_mover._animate()

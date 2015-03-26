@@ -16,6 +16,7 @@ angular.module('multiGallery').service 'CycleGenerator', ->
       @_items = items
       @_count = items.length
       @_cycleItems = []
+      @_cycleIndex = 0
 
     setIndex: (index)->
       @_index = index
