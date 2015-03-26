@@ -52,5 +52,5 @@ app.controller 'AppController', ['$scope', ($scope) ->
 
 Copy style to your project or use build of bower components
 - [Link for styles](https://github.com/Rademade/angular-cycle-gallery/blob/master/src/sass/import.sass)
-- Path for bower build styles: */build/stylesheets.min.css*
+- Path for bower build styles: `/build/stylesheets.min.css`
 
