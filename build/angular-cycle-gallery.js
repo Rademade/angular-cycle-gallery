@@ -176,7 +176,8 @@
       CycleGenerator.prototype.setItems = function(items) {
         this._items = items;
         this._count = items.length;
-        return this._cycleItems = [];
+        this._cycleItems = [];
+        return this._cycleIndex = 0;
       };
 
       CycleGenerator.prototype.setIndex = function(index) {
@@ -1108,13 +1109,13 @@
         }
         this._trigger = false;
         slides_diff = this._holder.getDisplayIndex() - this._mover.getTrueIndex();
-        if (slides_diff !== 0) {
-          this._rerenderOnIndexDiff(slides_diff);
-        } else {
+        if (slides_diff === 0) {
           this._moveTracking(true);
           if (this._isSwipeReady()) {
             this._swipeChange();
           }
+        } else {
+          this._rerenderOnIndexDiff(slides_diff);
         }
         this._mover._detectPositionClear();
         return this._mover._animate();
