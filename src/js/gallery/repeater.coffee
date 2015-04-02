@@ -40,7 +40,7 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       $scope.$watchCollection _collectionName, (items)-> mover.render(items)
 
       # Document events
-      angular.element($window).bind 'resize', -> resize.do()
+      angular.element($window).bind 'resize orientationchange', -> resize.do()
 
 
       # Touch events

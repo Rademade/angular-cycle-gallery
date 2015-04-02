@@ -66,7 +66,7 @@
           $scope.$watchCollection(_collectionName, function(items) {
             return mover.render(items);
           });
-          angular.element($window).bind('resize', function() {
+          angular.element($window).bind('resize orientationchange', function() {
             return resize["do"]();
           });
           _$holder.on('touchstart', function(e) {
