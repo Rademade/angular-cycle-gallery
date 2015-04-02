@@ -599,7 +599,9 @@
         };
 
         GalleryMover.prototype.updateSizes = function() {
-          return this._holder.update();
+          this._stopAnimationSide();
+          this._holder.update();
+          return this._applyPositionForNecessaryIndex();
         };
 
         GalleryMover.prototype.forceMove = function(position) {
