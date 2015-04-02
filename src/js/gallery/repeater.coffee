@@ -53,6 +53,7 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       # Methods
 
       $rootScope.setGalleryIndex = (index)-> mover.setIndex( index - 0 )
+      $rootScope.updateSizes = -> mover.updateSizes()
 
 
       # Private methods

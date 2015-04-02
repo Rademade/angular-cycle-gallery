@@ -15,7 +15,6 @@ app.controller 'AppController', ['$scope', ($scope) ->
     {text: 'Item 11', color: 'darkgrey'}
   ]
 
-
   $scope.add = ->
     count = $scope.gallery.length
     $scope.gallery.push text: "Item #{count}"
@@ -25,6 +24,12 @@ app.controller 'AppController', ['$scope', ($scope) ->
 
   $scope.$watch '$galleryIndex', (index)->
     console.log('Gallery item index changed', index)
+
+  $scope.showGallery = true
+
+  $scope.toggleGallery = ->
+    $scope.updateSizes()
+    $scope.showGallery = !$scope.showGallery
 
   window.s = $scope
 

@@ -7,7 +7,7 @@ html(ng-app="app")
         <!-- endinject -->
     body(ng-controller="AppController")
         h1 Gallery example
-        div.gallery-wrapper(gallery-config-buffer="2")
+        div.gallery-wrapper(gallery-config-buffer="2" ng-show="showGallery")
             div.gallery-slider
                 div.gallery-item(gallery-repeater="item in gallery" ng-style="{'background-color':item.color}")
                     div.gallery-item-content()
@@ -17,5 +17,7 @@ html(ng-app="app")
             button.action-button.prev(gallery-button="prev") prev
             button.action-button.next.animate(gallery-button="animateNext") Animate next
             button.action-button.prev.animate(gallery-button="animatePrev") Animate prev
+
+        button(ng-click="toggleGallery()") Toggl gallery
         <!-- inject:js -->
         <!-- endinject -->
