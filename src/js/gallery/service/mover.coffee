@@ -73,7 +73,11 @@ angular.module('multiGallery').service 'GalleryMover', [
         --@_necessaryIndex
         @_animate()
 
-      getAnimationSide: -> @_animation_side
+      getAnimationSide: ->
+        @_animation_side
+
+      updateSizes: ->
+        @_holder.update()
 
       forceMove: (position)->
         @_holder.setPosition( @_getPositionForDisplayIndex() + position )
