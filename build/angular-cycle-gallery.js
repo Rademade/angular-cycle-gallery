@@ -81,6 +81,9 @@
           $rootScope.setGalleryIndex = function(index) {
             return mover.setIndex(index - 0);
           };
+          $rootScope.updateSizes = function() {
+            return mover.updateSizes();
+          };
           updateIndex = function() {
             return $scope[_galleryIndexName] = storage.getIndex();
           };
@@ -593,6 +596,10 @@
 
         GalleryMover.prototype.getAnimationSide = function() {
           return this._animation_side;
+        };
+
+        GalleryMover.prototype.updateSizes = function() {
+          return this._holder.update();
         };
 
         GalleryMover.prototype.forceMove = function(position) {
