@@ -81,7 +81,7 @@
           $rootScope.setGalleryIndex = function(index) {
             return mover.setIndex(index - 0);
           };
-          $rootScope.updateSizes = function() {
+          $rootScope.updateGallerySizes = function() {
             return mover.updateSizes();
           };
           updateIndex = function() {
