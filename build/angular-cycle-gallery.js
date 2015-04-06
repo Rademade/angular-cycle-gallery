@@ -63,6 +63,9 @@
           GalleryEvents.on('index:update', function() {
             return updateIndex();
           });
+          $element.on('$destroy', function() {
+            return GalleryEvents.clear();
+          });
           $scope.$watchCollection(_collectionName, function(items) {
             return mover.render(items);
           });
@@ -264,6 +267,9 @@
             }
             return results;
           }
+        },
+        clear: function() {
+          return this._stack = {};
         }
       };
     }

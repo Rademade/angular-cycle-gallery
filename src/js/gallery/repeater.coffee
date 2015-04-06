@@ -36,6 +36,7 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       GalleryEvents.on 'animate:next', -> mover.animateNext()
       GalleryEvents.on 'animate:prev', -> mover.animatePrev()
       GalleryEvents.on 'index:update', -> updateIndex()
+      $element.on '$destroy', -> GalleryEvents.clear()
 
       $scope.$watchCollection _collectionName, (items)-> mover.render(items)
 

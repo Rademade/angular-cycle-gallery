@@ -13,4 +13,6 @@ angular.module('multiGallery').service 'GalleryEvents', [ ->
       for func in @_stack[name]
         func()
 
+  clear: () ->  @_stack = {}
+
 ]
