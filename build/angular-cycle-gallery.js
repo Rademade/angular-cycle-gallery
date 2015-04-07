@@ -964,7 +964,7 @@
 
       Resize.prototype.resizeTimeout = 0;
 
-      Resize.prototype.resizeDelay = 500;
+      Resize.prototype.resizeDelay = 0;
 
       function Resize(mover, holder) {
         this.mover = mover;

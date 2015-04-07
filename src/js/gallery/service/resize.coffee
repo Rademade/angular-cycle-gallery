@@ -6,7 +6,7 @@ angular.module('multiGallery').service 'Resize', ->
     holder: null
 
     resizeTimeout: 0
-    resizeDelay: 500
+    resizeDelay: 0
 
     constructor: (mover, holder)->
       @mover = mover
