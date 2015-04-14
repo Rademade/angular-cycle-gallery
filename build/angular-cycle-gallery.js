@@ -69,7 +69,7 @@
           $scope.$watchCollection(_collectionName, function(items) {
             return mover.render(items);
           });
-          window.resizeEmulator.bind(resize["do"], 1);
+          window.resizeEmulator.bind(resize["do"], 'resize.do');
           _$holder.on('touchstart', function(e) {
             return touch.touchStart(e.touches[0].pageX);
           });
