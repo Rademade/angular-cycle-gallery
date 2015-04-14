@@ -26,7 +26,7 @@
 
 (function() {
   angular.module('multiGallery').directive('galleryRepeater', [
-    'GalleryRenderer', 'ItemsStorage', 'MoverHolder', 'GalleryMover', 'MoverTouch', 'GalleryEvents', 'Resize', '$window', '$rootScope', function(GalleryRenderer, ItemsStorage, MoverHolder, GalleryMover, MoverTouch, GalleryEvents, Resize, $window, $rootScope) {
+    'GalleryRenderer', 'ItemsStorage', 'MoverHolder', 'GalleryMover', 'MoverTouch', 'GalleryEvents', 'Resize', '$window', '$rootScope', 'ResizeEmulator', function(GalleryRenderer, ItemsStorage, MoverHolder, GalleryMover, MoverTouch, GalleryEvents, Resize, $window, $rootScope, ResizeEmulator) {
       return {
         terminal: true,
         transclude: 'element',
@@ -69,9 +69,7 @@
           $scope.$watchCollection(_collectionName, function(items) {
             return mover.render(items);
           });
-          angular.element($window).bind('resize orientationchange', function() {
-            return resize["do"]();
-          });
+          window.resizeEmulator.bind(resize["do"], 1);
           _$holder.on('touchstart', function(e) {
             return touch.touchStart(e.touches[0].pageX);
           });
@@ -955,6 +953,8 @@
 }).call(this);
 
 (function() {
+  var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   angular.module('multiGallery').service('Resize', function() {
     var Resize;
     return Resize = (function() {
@@ -967,6 +967,7 @@
       Resize.prototype.resizeDelay = 0;
 
       function Resize(mover, holder) {
+        this["do"] = bind(this["do"], this);
         this.mover = mover;
         this.holder = holder;
       }
@@ -989,6 +990,90 @@
 
     })();
   });
+
+}).call(this);
+
+(function() {
+  angular.module('multiGallery').service('ResizeEmulator', [
+    '$window', function($window) {
+      var Action, ResizeEmulator;
+      ResizeEmulator = (function() {
+        ResizeEmulator._storage = [];
+
+        function ResizeEmulator() {
+          this._storage = [];
+          angular.element($window).bind('resize orientationchange', (function(_this) {
+            return function() {
+              return _this.onResize();
+            };
+          })(this));
+        }
+
+        ResizeEmulator.prototype.onResize = function() {
+          var action, i, len, ref, results;
+          if (this._storage.length > 0) {
+            ref = this._storage;
+            results = [];
+            for (i = 0, len = ref.length; i < len; i++) {
+              action = ref[i];
+              results.push(action.apply());
+            }
+            return results;
+          }
+        };
+
+        ResizeEmulator.prototype.bind = function(fn, key) {
+          var action;
+          action = this.actionExists(key);
+          if (action) {
+            return action.fn = fn;
+          } else {
+            action = new Action(fn, key);
+            return this._storage.push(action);
+          }
+        };
+
+        ResizeEmulator.prototype.actionExists = function(key) {
+          var action, i, len, ref;
+          ref = this._storage;
+          for (i = 0, len = ref.length; i < len; i++) {
+            action = ref[i];
+            if (action.key === key) {
+              return action;
+            }
+          }
+          return false;
+        };
+
+        ResizeEmulator.prototype.unbind = function(key) {
+          return this._storage[key] = [];
+        };
+
+        return ResizeEmulator;
+
+      })();
+      Action = (function() {
+        Action.key = null;
+
+        Action.fn = null;
+
+        function Action(fn, key) {
+          this.fn = fn;
+          this.key = key;
+        }
+
+        Action.prototype.apply = function() {
+          return this.fn.call();
+        };
+
+        return Action;
+
+      })();
+      if (!window.resizeEmulator) {
+        return window.resizeEmulator = new ResizeEmulator();
+      }
+    }
+  ]);
 
 }).call(this);
 

@@ -1,13 +1,12 @@
 angular.module('multiGallery').directive 'galleryRepeater', [
-  'GalleryRenderer', 'ItemsStorage', 'MoverHolder', 'GalleryMover', 'MoverTouch', 'GalleryEvents', 'Resize', '$window', '$rootScope'
-  (GalleryRenderer, ItemsStorage, MoverHolder, GalleryMover, MoverTouch, GalleryEvents, Resize, $window, $rootScope)->
+  'GalleryRenderer', 'ItemsStorage', 'MoverHolder', 'GalleryMover', 'MoverTouch', 'GalleryEvents', 'Resize', '$window', '$rootScope', 'ResizeEmulator',
+  (GalleryRenderer, ItemsStorage, MoverHolder, GalleryMover, MoverTouch, GalleryEvents, Resize, $window, $rootScope, ResizeEmulator)->
 
     terminal: true
     transclude : 'element'
     terminal : true
     $$tlb : true
     priority: 1000
-
     link: ($scope, $element, $attr, nullController, renderFunction) ->
 
       # Attributes
@@ -41,8 +40,7 @@ angular.module('multiGallery').directive 'galleryRepeater', [
       $scope.$watchCollection _collectionName, (items)-> mover.render(items)
 
       # Document events
-      angular.element($window).bind 'resize orientationchange', -> resize.do()
-
+      window.resizeEmulator.bind(resize.do, 1)
 
       # Touch events
 

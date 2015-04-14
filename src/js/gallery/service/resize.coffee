@@ -12,7 +12,7 @@ angular.module('multiGallery').service 'Resize', ->
       @mover = mover
       @holder = holder
 
-    do: ->
+    do: =>
       clearTimeout(@resizeTimeout)
       @resizeTimeout = setTimeout (=> @_resize()), @resizeDelay
 
