@@ -1,6 +1,6 @@
 angular.module('cycleGallery').service 'Finder', ->
     
-  loadGalleryObject: ($element)->
+  loadGalleryObject: ($element) ->
     $parent = $element
 
     while (!($parent.attr('cycle-gallery')))

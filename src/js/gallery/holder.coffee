@@ -11,7 +11,7 @@ angular.module('cycleGallery').directive 'cycleGalleryHolder', [
         gallery.holder.setElement($element)
 
         # Touch events
-        $element.on 'touchstart', (e)->
+        $element.on 'touchstart', (e) ->
           gallery.touch.touchStart(e.touches[0].pageX)
 
 ]

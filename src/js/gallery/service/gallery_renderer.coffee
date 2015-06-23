@@ -27,13 +27,13 @@ angular.module('cycleGallery').service 'GalleryRenderer', [
       firstElement: ->
         @_renderedItems.firstElement()
 
-      getElementByIndex: (index)->
+      getElementByIndex: (index) ->
         @_$hostElement.children().eq(index)[0]
 
-      getRightElementsCount: ($element)->
+      getRightElementsCount: ($element) ->
         @getRenderedCount() - @getElementIndex($element)
 
-      getElementIndex: (element)->
+      getElementIndex: (element) ->
         i = 0
         while ((element = element.previousSibling) != null)
           ++i
@@ -47,20 +47,20 @@ angular.module('cycleGallery').service 'GalleryRenderer', [
         for item, i in items
           @_renderedItems.addItem(i, item)
 
-      _updateHolder: (items)->
+      _updateHolder: ->
         for item in @_renderedItems.getItemsForRender()
           $itemScope = @_newItemScope(item.getData())
           @_transcludeFunction $itemScope, ($element) =>
             item.setRenderData($itemScope, $element)
             @_appendItem(item, $element)
 
-      _appendItem: (item, $element)->
+      _appendItem: (item, $element) ->
         if item.getIndex() == 0
           @_$hostElement.prepend($element)
         else
           @_renderedItems.getElementByIndex( item.getIndex() - 1 ).after($element)
 
-      _newItemScope: (item)->
+      _newItemScope: (item) ->
         $itemScope = @_$scope.$new()
         $itemScope[@_scopeItemName] = item
         return $itemScope

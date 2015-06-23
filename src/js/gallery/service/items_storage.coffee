@@ -7,7 +7,7 @@ angular.module('cycleGallery').service 'ItemsStorage', [
       # @params [Object] config
       #   - {bufferCount}
       #
-      constructor: (config)->
+      constructor: (config) ->
         # Nearest
         @nearestItemsCount = config.bufferCount
 
@@ -48,7 +48,7 @@ angular.module('cycleGallery').service 'ItemsStorage', [
         @cycler.setItems(@items)
         @setIndex(0)
 
-      getNearestRange: () ->
+      getNearestRange: ->
         return [] if @count == 0
         @cycler.setIndex( @_counterIndex )
         [].concat(
@@ -56,11 +56,11 @@ angular.module('cycleGallery').service 'ItemsStorage', [
           @cycler.getNext(@nearestItemsCount + @nextBuffer + 1) # +1 is current element
         )
 
-      setIndex: (index)->
+      setIndex: (index) ->
         @_setItemIndex(index)
         @_counterIndex = @getIndex()
 
-      setIndexDiff: (index_diff)->
+      setIndexDiff: (index_diff) ->
         @_counterIndex += index_diff
         @_setItemIndex( @getIndex() + index_diff )
 
@@ -98,13 +98,13 @@ angular.module('cycleGallery').service 'ItemsStorage', [
         @_counterIndex -= @prevBuffer
         @prevBuffer = 0
 
-      _setItemIndex: (index)->
+      _setItemIndex: (index) ->
         index = @_fixItemIndex(index)
         unless @index == index
           @index = index
           @trigger('change:index')
 
-      _fixItemIndex: (index)->
+      _fixItemIndex: (index) ->
         index = index%@count if index >= @count and @count > 0
         index = @count + index if index < 0
         index = @_fixItemIndex(index) unless 0 <= index < @count or @count == 0

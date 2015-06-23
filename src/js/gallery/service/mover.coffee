@@ -29,17 +29,17 @@ angular.module('cycleGallery').service 'GalleryMover', [
       # Public methods
       # @param config {animationTime}
       #
-      setScope: ($scope)->
+      setScope: ($scope) ->
         @_$scope = $scope
 
-      render: (items = [])->
+      render: (items = []) ->
         @_storage.setItems(items)
         @_renderer.render( @_storage.getNearestRange() )
         @_holder.update()
         @_syncIndexes()
         @_applyPositionForNecessaryIndex()
 
-      setIndex: (index)->
+      setIndex: (index) ->
         return @_stopAnimationSide() if @_animation_side
         @_storage.setIndex(index)
         @_syncIndexes()
@@ -78,11 +78,11 @@ angular.module('cycleGallery').service 'GalleryMover', [
         @_holder.update()
         @_applyPositionForNecessaryIndex()
 
-      forceMove: (position)->
+      forceMove: (position) ->
         @_holder.setPosition( @_getPositionForDisplayIndex() + position )
         @_detectPosition()
 
-      applyIndexDiff: (index_diff)->
+      applyIndexDiff: (index_diff) ->
         @_storage.setIndexDiff( index_diff )
         @_storage.clearRangeBuffer()
         @_syncIndexes()
@@ -117,7 +117,7 @@ angular.module('cycleGallery').service 'GalleryMover', [
 
       # Animation block
 
-      _animate: (position = @_getPositionForNecessaryIndex())->
+      _animate: (position = @_getPositionForNecessaryIndex()) ->
         @_stopPreviusAnimation()
         # TODO make request animation frame animation. Remove dependencies
         @_animation = TweenMax.to(@_holder.getElement(), @_getAnimationTime()/1000, {

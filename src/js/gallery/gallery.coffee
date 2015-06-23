@@ -16,7 +16,7 @@ angular.module('cycleGallery').directive 'cycleGallery', [
     GalleryEvents,
     Resize,
     ResizeEmulator
-  )->
+  ) ->
 
     restrict: 'A',
     scope:

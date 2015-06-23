@@ -10,28 +10,28 @@ angular.module('cycleGallery').service 'CycleGenerator', ->
       @_index = null
       @_clearCycleParams()
 
-    setItems: (items)->
+    setItems: (items) ->
       @_items = items
       @_count = items.length
       @_clearCycleParams()
 
-    setIndex: (index)->
+    setIndex: (index) ->
       @_index = index
 
-    getPrev: (count)->
+    getPrev: (count) ->
       to = @_cycleIndex + @_index
       from = to - count
       return @_cycleItems.slice(from, to) if from >= 0 
       @_cycleGenerate( Math.ceil(from/@_count)*-1, yes ) # Need to add more {prev_elements_cycle}
       return @getPrev(count)
 
-    getNext: (count)->
+    getNext: (count) ->
       from = @_cycleIndex + @_index
       to = from + count
       @_cycleGenerate( Math.ceil(to/@_count), no ) if to > @_cycleItems.length - 1 # Add more element to array.
       @_cycleItems.slice(from, to)
 
-    _cycleGenerate: (cycleMultiplier, toStart = false)->
+    _cycleGenerate: (cycleMultiplier, toStart = no) ->
       for i in [0..cycleMultiplier]
         items = JSON.parse( JSON.stringify( @_items ) ) # TODO make safe cloning
         if (toStart)
@@ -40,7 +40,7 @@ angular.module('cycleGallery').service 'CycleGenerator', ->
         else
           @_cycleItems = @_cycleItems.concat( @_addUIID(items) )
 
-    _addUIID: (items)->
+    _addUIID: (items) ->
       for item in items
         item._$UUID = ++AUTO_INCREMENT
       items

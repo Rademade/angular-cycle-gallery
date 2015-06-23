@@ -2,7 +2,7 @@ angular.module('cycleGallery').service 'RenderedItem', ->
 
   class RenderedItem
 
-    constructor: (index, data)->
+    constructor: (index, data) ->
       @_index = index
       @_data = data
 
@@ -18,7 +18,7 @@ angular.module('cycleGallery').service 'RenderedItem', ->
     getIndex: ->
       @_index
 
-    isDataMatch: (data)->
+    isDataMatch: (data) ->
       @_data and data and @_data._$UUID == data._$UUID
 
     getData: ->
@@ -26,7 +26,7 @@ angular.module('cycleGallery').service 'RenderedItem', ->
 
     getElement: -> @_element
 
-    updateRenderIndex: (index)->
+    updateRenderIndex: (index) ->
       @_index = index
       @_outdate = no
       @_rendered = yes

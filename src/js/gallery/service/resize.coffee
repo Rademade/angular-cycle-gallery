@@ -2,7 +2,7 @@ angular.module('cycleGallery').factory 'Resize', ->
 
   class Resize
 
-    constructor: (mover, holder)->
+    constructor: (mover, holder) ->
       @mover = mover
       @holder = holder
       @resizeTimeout = 0

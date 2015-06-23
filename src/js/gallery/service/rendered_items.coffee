@@ -7,7 +7,7 @@ angular.module('cycleGallery').factory 'RenderedItems', [
       constructor: ->
         @_items = []
 
-      addItem: (index, data)->
+      addItem: (index, data) ->
         for item in @_items
           if item.isDataMatch(data)
             item.updateRenderIndex(index)
@@ -43,7 +43,7 @@ angular.module('cycleGallery').factory 'RenderedItems', [
       firstElement: ->
         @getElementByIndex(0)
 
-      getElementByIndex: (index)->
+      getElementByIndex: (index) ->
         for item in @_items
           return item.getElement() if item.getIndex() == index
 

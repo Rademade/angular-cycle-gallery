@@ -6,7 +6,7 @@ angular.module('cycleGallery').factory 'ResizeEmulator', [
 
       constructor: ->
         @_storage = []
-        angular.element($window).bind('resize orientationchange', => @onResize())
+        angular.element($window).bind 'resize orientationchange', => @onResize()
 
       onResize: ->
         if @_storage.length > 0
@@ -21,13 +21,13 @@ angular.module('cycleGallery').factory 'ResizeEmulator', [
           action = new ResizeEmulatorAction(fn, key)
           @_storage.push(action)
 
-      actionExists : (key)->
+      actionExists: (key) ->
         for action in @_storage
           if action.key == key
             return action
         false
 
-      unbind: (key)->
-        @_storage[key] = []
+      unbind: (key) ->
+        @_storage[key] ||= []
 
 ]

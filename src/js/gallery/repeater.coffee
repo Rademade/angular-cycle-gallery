@@ -23,7 +23,7 @@ angular.module('cycleGallery').directive 'galleryRepeater', [
 
 
       # Watchers
-      $scope.$watchCollection _collectionName, (items)->
+      $scope.$watchCollection _collectionName, (items) ->
         gallery.mover.render(items)
 
 ]

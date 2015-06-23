@@ -21,11 +21,12 @@ app.controller 'AppController', ['$scope', ($scope) ->
     {text: 'Item 11', color: 'darkgrey'}
   ]
 
+  # TODO make a binding
   $scope.baseIndex = 5
 
   _gallery = null
 
-  $scope.onGalleryInit = (gallery)->
+  $scope.onGalleryInit = (gallery) ->
     console.log('First gallery load')
     _gallery = gallery
 
