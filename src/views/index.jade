@@ -8,7 +8,14 @@ html(ng-app="app")
     body(ng-controller="AppController")
 
         h2 1. Gallery example
-        div.gallery-wrapper(cycle-gallery gallery-init="onGalleryInit" config-buffer="2" gallery-index="baseIndex" ng-show="showGallery")
+        div.gallery-wrapper(
+            cycle-gallery
+            gallery-init="onGalleryInit"
+            config-buffer="2"
+            config-animation-time="250"
+            gallery-index="baseIndex"
+            ng-show="showGallery"
+        )
             div.gallery-slider(cycle-gallery-holder)
                 div.gallery-item(gallery-repeater="item in gallery" ng-style="{'background-color':item.color}")
                     div.gallery-item-content()

@@ -23,6 +23,7 @@ angular.module('cycleGallery').directive 'cycleGallery', [
       galleryInit: '&galleryInit'
       galleryIndex: '=galleryIndex'
       configBuffer: '=configBuffer'
+      configAnimationTime: '=configAnimationTime'
 
 
     compile: ($scope, $element) ->
@@ -37,8 +38,7 @@ angular.module('cycleGallery').directive 'cycleGallery', [
           render:
             bufferCount: $scope.configBuffer || 2
           mover:
-            animationTime: 300
-
+            animationTime: $scope.configAnimationTime || 300
 
         # Initialize
         storage = new ItemsStorage(config.render)
