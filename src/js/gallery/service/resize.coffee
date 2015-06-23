@@ -6,7 +6,7 @@ angular.module('cycleGallery').factory 'Resize', ->
       @mover = mover
       @holder = holder
       @resizeTimeout = 0
-      @resizeDelay = 0
+      @resizeDelay = 25
 
     do: =>
       clearTimeout(@resizeTimeout)

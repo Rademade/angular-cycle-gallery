@@ -13,18 +13,17 @@ angular.module('cycleGallery').factory 'ResizeEmulator', [
           for action in @_storage
             action.apply()
 
-      bind: (fn, key) ->
-        action = @actionExists(key)
-        if action
-          action.fn = fn
+      # TODO change params order
+      bind: (callback, key) ->
+        if action = @actionExists(key)
+          action.fn = callback
         else
-          action = new ResizeEmulatorAction(fn, key)
+          action = new ResizeEmulatorAction(callback, key)
           @_storage.push(action)
 
       actionExists: (key) ->
         for action in @_storage
-          if action.key == key
-            return action
+          return action if action.key == key
         false
 
       unbind: (key) ->

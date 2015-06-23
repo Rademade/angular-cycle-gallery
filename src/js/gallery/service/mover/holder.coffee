@@ -2,10 +2,10 @@ angular.module('cycleGallery').service 'MoverHolder', ->
 
   class MoverHolder
 
-    _$hostElement: null
-    _itemWidth: 0
-
-    _position_lock: null
+    constructor: ->
+      @_$hostElement = null
+      @_itemWidth = 0
+      @_position_lock = null
 
     setElement: ($element) ->
       @_$hostElement = $element

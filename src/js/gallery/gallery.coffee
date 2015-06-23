@@ -50,27 +50,25 @@ angular.module('cycleGallery').directive 'cycleGallery', [
         events = new GalleryEvents()
 
 
-        window.e = GalleryEvents
-
         # Options
         storage.setIndex($scope.galleryIndex || 0)
 
 
         # Element binding
         $element[0].cycleGallery = {
-          renderer: renderer,
-          storage: storage,
-          holder: holder,
-          mover: mover,
-          touch: touch,
-          resize: resize,
+          renderer: renderer
+          storage: storage
+          holder: holder
+          mover: mover
+          touch: touch
+          resize: resize
           events: events
         }
 
 
         # Global events
         window.resizeEmulator = new ResizeEmulator() unless window.resizeEmulator
-        window.resizeEmulator.bind(resize.do, 'resize.do')
+        window.resizeEmulator.bind(resize.do, $element)
 
 
         # Events
@@ -103,9 +101,11 @@ angular.module('cycleGallery').directive 'cycleGallery', [
           return if index == storage.getIndex() or index == undefined
           mover.setIndex(index)
 
+
         # On destroy
         $element.on '$destroy', ->
-          GalleryEvents.clear()
+          events.clear()
+          window.resizeEmulator.unbind($element)
           delete $element[0].cycleGallery
 
 ]

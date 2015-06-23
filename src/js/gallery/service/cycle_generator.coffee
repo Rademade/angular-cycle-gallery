@@ -18,13 +18,26 @@ angular.module('cycleGallery').service 'CycleGenerator', ->
     setIndex: (index) ->
       @_index = index
 
+    # Get element before current index
+    #
     getPrev: (count) ->
       to = @_cycleIndex + @_index
       from = to - count
-      return @_cycleItems.slice(from, to) if from >= 0 
-      @_cycleGenerate( Math.ceil(from/@_count)*-1, yes ) # Need to add more {prev_elements_cycle}
-      return @getPrev(count)
 
+      # Recalculate if need to rebuild indexes and cycleItems
+      if from < 0
+        @_cycleGenerate( Math.ceil(from/@_count)*-1, yes ) # Need to add more {prev_elements_cycle}
+        return @getPrev(count)
+
+      # Add additional items to cycleItems
+      @_cycleGenerate( Math.ceil(count/@_count), yes ) if @_cycleItems.length < to
+
+      # Slice elements
+      @_cycleItems.slice(from, to)
+
+
+    # Get next element including index (current)
+    #
     getNext: (count) ->
       from = @_cycleIndex + @_index
       to = from + count

@@ -1,6 +1,6 @@
 app = angular.module('app', ['cycleGallery'])
 
-app.controller 'AppController', ['$scope', ($scope) ->
+app.controller 'AppController', ($scope) ->
 
   $scope.otherItems = [
     {text:'First'},
@@ -21,23 +21,17 @@ app.controller 'AppController', ['$scope', ($scope) ->
     {text: 'Item 11', color: 'darkgrey'}
   ]
 
-  # TODO make a binding
   $scope.baseIndex = 5
+  $scope.showGallery = true
 
   _gallery = null
 
-  $scope.onGalleryInit = (gallery) ->
-    console.log('First gallery load')
-    _gallery = gallery
+  $scope.onGalleryInit = (gallery) -> _gallery = gallery
 
   $scope.add = ->
     count = $scope.gallery.length
     $scope.gallery.push text: "Item #{count}"
     _gallery.setIndex(1)
 
-  $scope.showGallery = true
-
   $scope.toggleGallery = ->
     $scope.showGallery = !$scope.showGallery
-
-]

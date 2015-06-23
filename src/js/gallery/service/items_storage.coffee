@@ -46,7 +46,7 @@ angular.module('cycleGallery').service 'ItemsStorage', [
         @count = items.length
         @items = items
         @cycler.setItems(@items)
-        @setIndex(0)
+        @setIndex(0) unless @isIndexInRange()
 
       getNearestRange: ->
         return [] if @count == 0
@@ -66,6 +66,9 @@ angular.module('cycleGallery').service 'ItemsStorage', [
 
       getIndex: ->
         @index
+
+      isIndexInRange: ->
+        0 <= @getIndex() <= @count
 
       nextIndex: ->
         @_setItemIndex(@index+1)

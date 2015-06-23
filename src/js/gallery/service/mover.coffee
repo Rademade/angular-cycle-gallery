@@ -117,7 +117,7 @@ angular.module('cycleGallery').service 'GalleryMover', [
 
       # Animation block
 
-      _animate: (position = @_getPositionForNecessaryIndex()) ->
+      _animate: (position = @_getPositionForNecessaryIndex())->
         @_stopPreviusAnimation()
         # TODO make request animation frame animation. Remove dependencies
         @_animation = TweenMax.to(@_holder.getElement(), @_getAnimationTime()/1000, {
