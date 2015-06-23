@@ -1,25 +1,21 @@
-angular.module('multiGallery').service 'MoverTouch', ->
+angular.module('cycleGallery').service 'MoverTouch', ->
 
   class MoverTouch
 
-    _mover: null
-    _storage: null
-    _holder: null
-
-    _trigger: false
-    _start_position: 0
-    _last_position: 0
-
-    # Foce swipe tracking
-    _last_track_time: null
-    _last_track_position: null
-    
     TRACK_TIME: 150
     MIN_POSITION_CHANGE: 30
 
     constructor: (mover, holder)->
       @_mover = mover
       @_holder = holder
+
+      @_trigger = false
+      @_start_position = 0
+      @_last_position = 0
+
+      # Force swipe tracking
+      @_last_track_time = null
+      @_last_track_position = null
 
     touchStart: (position)->
       @_trigger = true

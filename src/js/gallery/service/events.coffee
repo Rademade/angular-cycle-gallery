@@ -1,18 +1,18 @@
-angular.module('multiGallery').service 'GalleryEvents', [ ->
+angular.module('cycleGallery').factory 'GalleryEvents', ->
 
-  # TODO use native events
+  class GalleryEvents
 
-  _stack: {}
+    constructor: ->
+      @_stack = {}
 
-  on: (name, func) ->
-    unless @_stack[name] then @_stack[name] = []
-    @_stack[name].push(func)
+    on: (name, func) ->
+      @_stack[name] ||= []
+      @_stack[name].push(func)
 
-  do: (name) ->
-    if @_stack[name]
+    do: (name) ->
+      @_stack[name] ||= []
       for func in @_stack[name]
         func()
 
-  clear: () ->  @_stack = {}
-
-]
+    clear: ->
+      @_stack = {}

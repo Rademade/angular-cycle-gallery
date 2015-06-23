@@ -1,41 +1,38 @@
-angular.module('multiGallery').service 'GalleryMover', [
-  'GalleryConfig'
-  (GalleryConfig)->
+angular.module('cycleGallery').service 'GalleryMover', [
+
+  ->
 
     # TODO Need to extract sub components. Like animation and animate block
 
     class GalleryMover
 
-      ANIMATION_TIME: null
       ANIMATION_SIDE_NEXT: 1
       ANIMATION_SIDE_PREV: 2
 
-      _storage: null
-      _renderer: null
-      _holder: null
-      _$scope: null
+      constructor: (config, storage, renderer, holder) ->
 
-      _animation: null
-
-      _checked_position: null
-
-      _itemWidth: 0
-      _necessaryIndex: 0
-      _displayIndex: 0
-
-      # Public methods
-
-      constructor: (storage, renderer, holder, $scope)->
-        # Config
-        @ANIMATION_TIME = GalleryConfig.getAnimationSpeed()
-        
-        # Variables
+        # Options
+        @animationTime = config.animationTime
         @_storage = storage
         @_renderer = renderer
         @_holder = holder
+
+        # Private attributes
+        @_animation = null
+
+        # Private indexes for moving
+        @_necessaryIndex = 0
+        @_displayIndex = 0
+
+
+      #
+      # Public methods
+      # @param config {animationTime}
+      #
+      setScope: ($scope)->
         @_$scope = $scope
 
-      render: (items)->
+      render: (items = [])->
         @_storage.setItems(items)
         @_renderer.render( @_storage.getNearestRange() )
         @_holder.update()
@@ -113,7 +110,7 @@ angular.module('multiGallery').service 'GalleryMover', [
       _getAnimationTime: ->
         timestamp = (new Date()).getTime()
         @_animationStartTime = timestamp unless @_animationStartTime
-        @ANIMATION_TIME - (timestamp - @_animationStartTime)
+        @animationTime - (timestamp - @_animationStartTime)
 
       _clearAnimationTime: ->
         @_animationStartTime = null

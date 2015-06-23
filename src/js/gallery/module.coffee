@@ -1,1 +1,1 @@
-angular.module('multiGallery', [])
+angular.module('cycleGallery', [])

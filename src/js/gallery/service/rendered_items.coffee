@@ -1,10 +1,11 @@
-angular.module('multiGallery').service 'RenderedItems', [
+angular.module('cycleGallery').factory 'RenderedItems', [
   'RenderedItem',
   (RenderedItem)->
 
     class RenderedItems
 
-      _items: [],
+      constructor: ->
+        @_items = []
 
       addItem: (index, data)->
         for item in @_items

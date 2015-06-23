@@ -1,6 +1,6 @@
-angular.module('multiGallery').directive 'galleryButton', [
-  'GalleryActions',
-  (GalleryActions) ->
+angular.module('cycleGallery').directive 'galleryButton', [
+  'Finder',
+  (Finder) ->
 
     restrict: 'A',
     scope:
@@ -8,6 +8,13 @@ angular.module('multiGallery').directive 'galleryButton', [
 
     link: (scope, $element) ->
       action = scope.galleryButton
-      $element.on 'click', (e) -> GalleryActions[action]()
+      events = Finder.loadGalleryObject($element).events
+
+      $element.on 'click', ->
+        switch action
+          when 'next' then events.do('move:next')
+          when 'prev' then events.do('move:prev')
+          when 'animateNext' then events.do('animate:next')
+          when 'animatePrev' then events.do('animate:prev')
 
 ]

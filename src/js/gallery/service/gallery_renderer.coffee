@@ -1,27 +1,19 @@
-angular.module('multiGallery').service 'GalleryRenderer', [
+angular.module('cycleGallery').service 'GalleryRenderer', [
   'RenderedItems'
   (RenderedItems) ->
 
     class GalleryRenderer
 
-      # GalleryMover
-      _renderedItems: new RenderedItems()
-
-      _transcludeFunction: null
-
-      _$scope: null
-      _scopeItemName: null
-      _$holder: null
-
-      #
-      # Public methods
-      #
-
-      constructor: ($scope, scopeItemName, $holder, transcludeFunction)->
+      constructor: ($scope) ->
         @_$scope = $scope
+        @_renderedItems = new RenderedItems()
+
+      setOptions: (scopeItemName, transcludeFunction)->
         @_scopeItemName = scopeItemName
-        @_$holder = $holder
         @_transcludeFunction = transcludeFunction
+
+      setHostElement: ($element) ->
+        @_$hostElement = $element
 
       render: (items)->
         @_renderedItems.markAllOutdated()
@@ -36,7 +28,7 @@ angular.module('multiGallery').service 'GalleryRenderer', [
         @_renderedItems.firstElement()
 
       getElementByIndex: (index)->
-        @_$holder.children().eq(index)[0]
+        @_$hostElement.children().eq(index)[0]
 
       getRightElementsCount: ($element)->
         @getRenderedCount() - @getElementIndex($element)
@@ -64,7 +56,7 @@ angular.module('multiGallery').service 'GalleryRenderer', [
 
       _appendItem: (item, $element)->
         if item.getIndex() == 0
-          @_$holder.prepend($element)
+          @_$hostElement.prepend($element)
         else
           @_renderedItems.getElementByIndex( item.getIndex() - 1 ).after($element)
 

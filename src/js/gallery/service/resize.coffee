@@ -1,16 +1,12 @@
-angular.module('multiGallery').service 'Resize', ->
+angular.module('cycleGallery').factory 'Resize', ->
 
   class Resize
-
-    mover: null
-    holder: null
-
-    resizeTimeout: 0
-    resizeDelay: 0
 
     constructor: (mover, holder)->
       @mover = mover
       @holder = holder
+      @resizeTimeout = 0
+      @resizeDelay = 0
 
     do: =>
       clearTimeout(@resizeTimeout)

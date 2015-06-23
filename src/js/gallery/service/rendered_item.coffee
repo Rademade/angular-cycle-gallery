@@ -1,19 +1,19 @@
-angular.module('multiGallery').service 'RenderedItem', ->
+angular.module('cycleGallery').service 'RenderedItem', ->
 
   class RenderedItem
-
-    _index: null
-    _data: null
-    _element: null
-    _scope: null
-
-    _outdate: null
-    _rendered: no
 
     constructor: (index, data)->
       @_index = index
       @_data = data
+
+      # Status
       @_outdate = no
+      @_rendered = no
+
+      # Data
+      @_element = null
+      @_scope = null
+
 
     getIndex: ->
       @_index

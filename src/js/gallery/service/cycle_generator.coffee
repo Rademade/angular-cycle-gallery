@@ -1,22 +1,19 @@
-angular.module('multiGallery').service 'CycleGenerator', ->
+angular.module('cycleGallery').service 'CycleGenerator', ->
 
   AUTO_INCREMENT = 0
 
   class CycleGenerator
 
-    _count: 0
-    _items: []
-    _index: null
-
-    # Description [{prev_elements_cycle} | #cycle_index | {next_element_cycle}]
-    _cycleIndex: 0 
-    _cycleItems: []
+    constructor: ->
+      @_count = 0
+      @_items = []
+      @_index = null
+      @_clearCycleParams()
 
     setItems: (items)->
       @_items = items
       @_count = items.length
-      @_cycleItems = []
-      @_cycleIndex = 0
+      @_clearCycleParams()
 
     setIndex: (index)->
       @_index = index
@@ -42,9 +39,13 @@ angular.module('multiGallery').service 'CycleGenerator', ->
           @_cycleItems = @_addUIID(items).concat( @_cycleItems )
         else
           @_cycleItems = @_cycleItems.concat( @_addUIID(items) )
-        
 
     _addUIID: (items)->
       for item in items
         item._$UUID = ++AUTO_INCREMENT
       items
+
+    _clearCycleParams: ->
+      # Description [{prev_elements_cycle} | #cycle_index | {next_element_cycle}]
+      @_cycleItems = []
+      @_cycleIndex = 0
