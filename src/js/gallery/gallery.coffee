@@ -78,8 +78,8 @@ angular.module('cycleGallery').directive 'cycleGallery', [
         events.on 'animate:prev', -> mover.animatePrev()
 
         # Touch events
-        $body.on 'touchend', (e)-> touch.touchEnd()
-        $body.on 'touchmove', (e)-> touch.touchMove(e.touches[0].pageX)
+        $body.on 'touchend', (e) -> touch.touchEnd()
+        $body.on 'touchmove', (e) -> touch.touchMove(e.touches[0].pageX)
 
 
         # Move events
@@ -90,7 +90,7 @@ angular.module('cycleGallery').directive 'cycleGallery', [
         # Methods
         initializer = $scope.galleryInit()
         initializer({
-          setIndex: (index)-> mover.setIndex( index - 0 ),
+          setIndex: (index) -> mover.setIndex( index - 0 ),
           getIndex: -> storage.getIndex()
           updateSizes: -> mover.updateSizes(),
         }) if initializer

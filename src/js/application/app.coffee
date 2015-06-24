@@ -3,8 +3,8 @@ app = angular.module('app', ['cycleGallery'])
 app.controller 'AppController', ($scope) ->
 
   $scope.otherItems = [
-    {text:'First'},
-    {text:'Second'}
+    {text: 'First'}
+    {text: 'Second'}
   ]
 
   $scope.gallery = [

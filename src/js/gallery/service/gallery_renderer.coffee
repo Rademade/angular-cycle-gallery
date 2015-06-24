@@ -8,7 +8,7 @@ angular.module('cycleGallery').service 'GalleryRenderer', [
         @_$scope = $scope
         @_renderedItems = new RenderedItems()
 
-      setOptions: (scopeItemName, transcludeFunction)->
+      setOptions: (scopeItemName, transcludeFunction) ->
         @_scopeItemName = scopeItemName
         @_transcludeFunction = transcludeFunction
 

@@ -1,6 +1,6 @@
 angular.module('cycleGallery').service 'ItemsStorage', [
   'CycleGenerator'
-  (CycleGenerator)->
+  (CycleGenerator) ->
 
     class ItemsStorage
 

@@ -1,6 +1,6 @@
 angular.module('cycleGallery').factory 'ResizeEmulator', [
   'ResizeEmulatorAction', '$window',
-  (ResizeEmulatorAction, $window)->
+  (ResizeEmulatorAction, $window) ->
 
     class ResizeEmulator
 

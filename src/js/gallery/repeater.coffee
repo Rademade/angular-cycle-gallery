@@ -7,7 +7,7 @@ angular.module('cycleGallery').directive 'galleryRepeater', [
     $$tlb : true
     priority: 1000
 
-    link: ($scope, $element, $attr, nullController, renderFunction) =>
+    link: ($scope, $element, $attr, nullController, renderFunction) ->
 
       # Attributes
       _repeatAttributes = $attr['galleryRepeater']
