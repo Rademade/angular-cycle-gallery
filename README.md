@@ -45,7 +45,7 @@ AngularJS **responsive** gallery with loop items listing. Support:
 	    gallery-index="indexVariable" # 2 way binding for gallery index
 	    gallery-init="onGalleryInit" # Callback method. Call when gallery load
 
-2. `cycle-gallery-holder` marks holder element for our gallery
+2. `cycle-gallery-holder` marks holder element
 3. `gallery-repeater="item in list"` has same logic like `ng-repeat` but render only needed part of elements
 
 
@@ -55,12 +55,12 @@ Method `gallery-init` receive object that can manipulate with cycle-gallery
 
 Template:
 ```slim
-    div.wrapper(cycle-gallery gallery-init="onGalleryInit")
-	    // ...
+div.wrapper(cycle-gallery gallery-init="onGalleryInit")
+    // ...
 ```
 
 Controller:
-```
+```javascript
 function onGalleryInit(gallery) {
 	gallery.setIndex(1) # Set index with javascript API
 	gallery.getIndex() # Get current index
@@ -70,7 +70,7 @@ function onGalleryInit(gallery) {
 
 #### Complete example
 
-Complete template example
+Rich template example
 ```slim
 div.wrapper(
 	ng-controller="GalleryController"
