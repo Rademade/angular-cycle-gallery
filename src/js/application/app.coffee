@@ -1,6 +1,11 @@
-app = angular.module('app', ['multiGallery'])
+app = angular.module('app', ['cycleGallery'])
 
-app.controller 'AppController', ['$scope', ($scope) ->
+app.controller 'AppController', ($scope) ->
+
+  $scope.otherItems = [
+    {text: 'First'}
+    {text: 'Second'}
+  ]
 
   $scope.gallery = [
     {text: 'Item 1', color: 'red'}
@@ -12,25 +17,21 @@ app.controller 'AppController', ['$scope', ($scope) ->
     {text: 'Item 7', color: 'purple'}
     {text: 'Item 8', color: 'darkgreen'}
     {text: 'Item 9', color: 'darkblue'}
+    {text: 'Item 10', color: 'yellow'}
     {text: 'Item 11', color: 'darkgrey'}
   ]
+
+  $scope.baseIndex = 5
+  $scope.showGallery = true
+
+  _gallery = null
+
+  $scope.onGalleryInit = (gallery) -> _gallery = gallery
 
   $scope.add = ->
     count = $scope.gallery.length
     $scope.gallery.push text: "Item #{count}"
-
-  $scope.forceUpdate = ->
-    $scope.setGalleryIndex(2)
-
-  $scope.$watch '$galleryIndex', (index)->
-    console.log('Gallery item index changed', index)
-
-  $scope.showGallery = true
+    _gallery.setIndex(1)
 
   $scope.toggleGallery = ->
-    $scope.updateSizes()
     $scope.showGallery = !$scope.showGallery
-
-  window.s = $scope
-
-]

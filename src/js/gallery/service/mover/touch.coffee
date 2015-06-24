@@ -1,27 +1,23 @@
-angular.module('multiGallery').service 'MoverTouch', ->
+angular.module('cycleGallery').service 'MoverTouch', ->
 
   class MoverTouch
 
-    _mover: null
-    _storage: null
-    _holder: null
-
-    _trigger: false
-    _start_position: 0
-    _last_position: 0
-
-    # Foce swipe tracking
-    _last_track_time: null
-    _last_track_position: null
-    
     TRACK_TIME: 150
     MIN_POSITION_CHANGE: 30
 
-    constructor: (mover, holder)->
+    constructor: (mover, holder) ->
       @_mover = mover
       @_holder = holder
 
-    touchStart: (position)->
+      @_trigger = false
+      @_start_position = 0
+      @_last_position = 0
+
+      # Force swipe tracking
+      @_last_track_time = null
+      @_last_track_position = null
+
+    touchStart: (position) ->
       @_trigger = true
       @_mover._stopPreviusAnimation() # TODO fix name. Like a private function
       @_start_position = position - @_mover.getUseableDiff()
@@ -30,7 +26,7 @@ angular.module('multiGallery').service 'MoverTouch', ->
       @_startSwipeDetecting()
       @_moveTrackingReload()
 
-    touchMove: (position)->
+    touchMove: (position) ->
       return true unless @_trigger
       @_setPosition(position - @_start_position)
       @_mover.forceMove( @_getPosition() )
@@ -53,7 +49,7 @@ angular.module('multiGallery').service 'MoverTouch', ->
       @_mover._animate()
 
 
-    _rerenderOnIndexDiff: (slides_diff)->
+    _rerenderOnIndexDiff: (slides_diff) ->
       current_position_diff = @_mover.getUseableDiff()
       @_mover.applyIndexDiff( slides_diff )
       @_holder.setPosition( @_holder.getCurrentPosition() + current_position_diff )
@@ -68,7 +64,7 @@ angular.module('multiGallery').service 'MoverTouch', ->
     _isSwipeReady: ->
       @_force_swipe
 
-    _setPosition: (position)->
+    _setPosition: (position) ->
       @_last_position = position
 
     _getPosition: ->
@@ -78,7 +74,7 @@ angular.module('multiGallery').service 'MoverTouch', ->
       @_last_track_time = (new Date()).getTime()
       @_last_track_position = @_getPosition()
 
-    _moveTracking: (force = false)->
+    _moveTracking: (force = no) ->
       track_timer_ready = (new Date()).getTime() - @_last_track_time > @TRACK_TIME
       force_check_conditions = force and not @_force_swipe
 

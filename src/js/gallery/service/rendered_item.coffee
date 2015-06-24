@@ -1,24 +1,24 @@
-angular.module('multiGallery').service 'RenderedItem', ->
+angular.module('cycleGallery').service 'RenderedItem', ->
 
   class RenderedItem
 
-    _index: null
-    _data: null
-    _element: null
-    _scope: null
-
-    _outdate: null
-    _rendered: no
-
-    constructor: (index, data)->
+    constructor: (index, data) ->
       @_index = index
       @_data = data
+
+      # Status
       @_outdate = no
+      @_rendered = no
+
+      # Data
+      @_element = null
+      @_scope = null
+
 
     getIndex: ->
       @_index
 
-    isDataMatch: (data)->
+    isDataMatch: (data) ->
       @_data and data and @_data._$UUID == data._$UUID
 
     getData: ->
@@ -26,7 +26,7 @@ angular.module('multiGallery').service 'RenderedItem', ->
 
     getElement: -> @_element
 
-    updateRenderIndex: (index)->
+    updateRenderIndex: (index) ->
       @_index = index
       @_outdate = no
       @_rendered = yes

@@ -1,50 +1,74 @@
-angular.module('multiGallery').service 'ItemsStorage', [
-  'CycleGenerator', 'GalleryEvents', 'GalleryConfig'
-  (CycleGenerator, GalleryEvents, GalleryConfig)->
+angular.module('cycleGallery').service 'ItemsStorage', [
+  'CycleGenerator'
+  (CycleGenerator) ->
 
     class ItemsStorage
 
-      _NEAREST_ITEMS: null
+      # @params [Object] config
+      #   - {bufferCount}
+      #
+      constructor: (config) ->
+        # Nearest
+        @nearestItemsCount = config.bufferCount
 
-      items: []
-      index: 0
-      count: 0
+        # Active params
+        @items = []
+        @index = 0
+        @count = 0
+        @nextBuffer = 0
+        @prevBuffer = 0
 
-      _counterIndex: 0
+        # Cycler
+        @cycler = new CycleGenerator()
 
-      nextBuffer: 0
-      prevBuffer: 0
+        # Private params
+        @_counterIndex = 0
+        @_events = {}
 
-      cycleMultiplier: 0
-      cycler: new CycleGenerator()
 
-      constructor: ()->
-        @_NEAREST_ITEMS = GalleryConfig.getBuffer()
+      #
+      # Event methods
+      #
+
+      on: (event, callback) =>
+        @_events[event] ||= []
+        @_events[event].push(callback)
+
+      trigger: (event) ->
+        return unless @_events[event]
+        for callback in @_events[event]
+          callback.call()
+
+
+      # Base logic
 
       setItems: (items) ->
         @count = items.length
         @items = items
         @cycler.setItems(@items)
-        @setIndex(0)
+        @setIndex(0) unless @isIndexInRange()
 
-      getNearestRange: () ->
+      getNearestRange: ->
         return [] if @count == 0
         @cycler.setIndex( @_counterIndex )
         [].concat(
-          @cycler.getPrev(@_NEAREST_ITEMS + @prevBuffer)
-          @cycler.getNext(@_NEAREST_ITEMS + @nextBuffer + 1) # +1 is current element
+          @cycler.getPrev(@nearestItemsCount + @prevBuffer)
+          @cycler.getNext(@nearestItemsCount + @nextBuffer + 1) # +1 is current element
         )
 
-      setIndex: (index)->
+      setIndex: (index) ->
         @_setItemIndex(index)
         @_counterIndex = @getIndex()
 
-      setIndexDiff: (index_diff)->
+      setIndexDiff: (index_diff) ->
         @_counterIndex += index_diff
         @_setItemIndex( @getIndex() + index_diff )
 
       getIndex: ->
         @index
+
+      isIndexInRange: ->
+        0 <= @getIndex() <= @count
 
       nextIndex: ->
         @_setItemIndex(@index+1)
@@ -55,7 +79,7 @@ angular.module('multiGallery').service 'ItemsStorage', [
         @_counterIndex--
 
       getCurrentIndexInRange: ->
-        @_NEAREST_ITEMS + @nextBuffer
+        @nearestItemsCount + @nextBuffer
 
       clearRangeBuffer: ->
         @_clearNextBuffer()
@@ -77,13 +101,13 @@ angular.module('multiGallery').service 'ItemsStorage', [
         @_counterIndex -= @prevBuffer
         @prevBuffer = 0
 
-      _setItemIndex: (index)->
+      _setItemIndex: (index) ->
         index = @_fixItemIndex(index)
         unless @index == index
           @index = index
-          GalleryEvents.do('index:update')
+          @trigger('change:index')
 
-      _fixItemIndex: (index)->
+      _fixItemIndex: (index) ->
         index = index%@count if index >= @count and @count > 0
         index = @count + index if index < 0
         index = @_fixItemIndex(index) unless 0 <= index < @count or @count == 0

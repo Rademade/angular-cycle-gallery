@@ -1,21 +1,31 @@
 (function() {
-  angular.module('multiGallery', []);
+  angular.module('cycleGallery', []);
 
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').directive('galleryButton', [
-    'GalleryActions', function(GalleryActions) {
+  angular.module('cycleGallery').directive('galleryButton', [
+    'Finder', function(Finder) {
       return {
         restrict: 'A',
         scope: {
           galleryButton: '@'
         },
         link: function(scope, $element) {
-          var action;
+          var action, events;
           action = scope.galleryButton;
-          return $element.on('click', function(e) {
-            return GalleryActions[action]();
+          events = Finder.loadGalleryObject($element).events;
+          return $element.on('click', function() {
+            switch (action) {
+              case 'next':
+                return events["do"]('move:next');
+              case 'prev':
+                return events["do"]('move:prev');
+              case 'animateNext':
+                return events["do"]('animate:next');
+              case 'animatePrev':
+                return events["do"]('animate:prev');
+            }
           });
         }
       };
@@ -25,86 +35,98 @@
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').directive('galleryRepeater', [
-    'GalleryRenderer', 'ItemsStorage', 'MoverHolder', 'GalleryMover', 'MoverTouch', 'GalleryEvents', 'Resize', '$window', '$rootScope', 'ResizeEmulator', function(GalleryRenderer, ItemsStorage, MoverHolder, GalleryMover, MoverTouch, GalleryEvents, Resize, $window, $rootScope, ResizeEmulator) {
-      return {
-        terminal: true,
-        transclude: 'element',
-        terminal: true,
-        $$tlb: true,
-        priority: 1000,
-        link: function($scope, $element, $attr, nullController, renderFunction) {
-          var _$body, _$holder, _collectionName, _galleryIndexName, _matchResult, _repeatAttributes, _scopeItemName, gallery, holder, mover, resize, storage, touch, updateIndex;
-          _repeatAttributes = $attr.galleryRepeater;
-          _matchResult = _repeatAttributes.match(/^\s*(.+)\s+in\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/);
-          _scopeItemName = _matchResult[1];
-          _collectionName = _matchResult[2];
-          _galleryIndexName = '$galleryIndex';
-          _$holder = $element.parent();
-          _$body = angular.element(document).find('body');
-          storage = new ItemsStorage();
-          gallery = new GalleryRenderer($scope, _scopeItemName, _$holder, renderFunction);
-          holder = new MoverHolder(_$holder);
-          mover = new GalleryMover(storage, gallery, holder, $scope);
-          touch = new MoverTouch(mover, holder);
-          resize = new Resize(mover, holder);
-          GalleryEvents.on('move:next', function() {
-            return mover.next();
-          });
-          GalleryEvents.on('move:prev', function() {
-            return mover.prev();
-          });
-          GalleryEvents.on('animate:next', function() {
-            return mover.animateNext();
-          });
-          GalleryEvents.on('animate:prev', function() {
-            return mover.animatePrev();
-          });
-          GalleryEvents.on('index:update', function() {
-            return updateIndex();
-          });
-          $element.on('$destroy', function() {
-            return GalleryEvents.clear();
-          });
-          $scope.$watchCollection(_collectionName, function(items) {
-            return mover.render(items);
-          });
-          window.resizeEmulator.bind(resize["do"], 'resize.do');
-          _$holder.on('touchstart', function(e) {
-            return touch.touchStart(e.touches[0].pageX);
-          });
-          _$body.on('touchend', function(e) {
-            return touch.touchEnd();
-          });
-          _$body.on('touchmove', function(e) {
-            return touch.touchMove(e.touches[0].pageX);
-          });
-          $rootScope.setGalleryIndex = function(index) {
-            return mover.setIndex(index - 0);
-          };
-          $rootScope.updateGallerySizes = function() {
-            return mover.updateSizes();
-          };
-          updateIndex = function() {
-            return $scope[_galleryIndexName] = storage.getIndex();
-          };
-          return updateIndex();
-        }
-      };
-    }
-  ]);
-
-}).call(this);
-
-(function() {
-  angular.module('multiGallery').directive('galleryConfigBuffer', [
-    'GalleryConfig', function(GalleryConfig) {
+  angular.module('cycleGallery').directive('cycleGallery', [
+    'GalleryRenderer', 'ItemsStorage', 'MoverHolder', 'GalleryMover', 'MoverTouch', 'GalleryEvents', 'Resize', 'ResizeEmulator', function(GalleryRenderer, ItemsStorage, MoverHolder, GalleryMover, MoverTouch, GalleryEvents, Resize, ResizeEmulator) {
       return {
         restrict: 'A',
-        compile: function(scope, $element) {
+        scope: {
+          galleryInit: '&galleryInit',
+          galleryIndex: '=galleryIndex',
+          configBuffer: '=configBuffer',
+          configAnimationTime: '=configAnimationTime'
+        },
+        compile: function($scope, $element) {
           return {
-            pre: function(scope, $element, attr) {
-              return GalleryConfig.setBuffer(attr.galleryConfigBuffer);
+            pre: function($scope, $element) {
+              var $body, config, events, holder, initializer, mover, renderer, resize, storage, touch;
+              $body = angular.element(document).find('body');
+              config = {
+                render: {
+                  bufferCount: $scope.configBuffer || 2
+                },
+                mover: {
+                  animationTime: $scope.configAnimationTime || 300
+                }
+              };
+              storage = new ItemsStorage(config.render);
+              renderer = new GalleryRenderer($scope);
+              holder = new MoverHolder();
+              mover = new GalleryMover(config.mover, storage, renderer, holder);
+              touch = new MoverTouch(mover, holder);
+              resize = new Resize(mover, holder);
+              events = new GalleryEvents();
+              storage.setIndex($scope.galleryIndex || 0);
+              $element[0].cycleGallery = {
+                renderer: renderer,
+                storage: storage,
+                holder: holder,
+                mover: mover,
+                touch: touch,
+                resize: resize,
+                events: events
+              };
+              if (!window.resizeEmulator) {
+                window.resizeEmulator = new ResizeEmulator();
+              }
+              window.resizeEmulator.bind(resize["do"], $element);
+              events.on('move:next', function() {
+                return mover.next();
+              });
+              events.on('move:prev', function() {
+                return mover.prev();
+              });
+              events.on('animate:next', function() {
+                return mover.animateNext();
+              });
+              events.on('animate:prev', function() {
+                return mover.animatePrev();
+              });
+              $body.on('touchend', function(e) {
+                return touch.touchEnd();
+              });
+              $body.on('touchmove', function(e) {
+                return touch.touchMove(e.touches[0].pageX);
+              });
+              storage.on('change:index', function() {
+                if ($scope.galleryIndex !== void 0) {
+                  return $scope.galleryIndex = storage.getIndex();
+                }
+              });
+              initializer = $scope.galleryInit();
+              if (initializer) {
+                initializer({
+                  setIndex: function(index) {
+                    return mover.setIndex(index - 0);
+                  },
+                  getIndex: function() {
+                    return storage.getIndex();
+                  },
+                  updateSizes: function() {
+                    return mover.updateSizes();
+                  }
+                });
+              }
+              $scope.$watch('galleryIndex', function(index) {
+                if (index === storage.getIndex() || index === void 0) {
+                  return;
+                }
+                return mover.setIndex(index);
+              });
+              return $element.on('$destroy', function() {
+                events.clear();
+                window.resizeEmulator.unbind($element);
+                return delete $element[0].cycleGallery;
+              });
             }
           };
         }
@@ -115,20 +137,21 @@
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('GalleryActions', [
-    'GalleryEvents', function(GalleryEvents) {
+  angular.module('cycleGallery').directive('cycleGalleryHolder', [
+    'Finder', function(Finder) {
       return {
-        next: function() {
-          return GalleryEvents["do"]('move:next');
-        },
-        prev: function() {
-          return GalleryEvents["do"]('move:prev');
-        },
-        animateNext: function() {
-          return GalleryEvents["do"]('animate:next');
-        },
-        animatePrev: function() {
-          return GalleryEvents["do"]('animate:prev');
+        compile: function($scope, $element) {
+          return {
+            pre: function($scope, $element) {
+              var gallery;
+              gallery = Finder.loadGalleryObject($element);
+              gallery.renderer.setHostElement($element);
+              gallery.holder.setElement($element);
+              return $element.on('touchstart', function(e) {
+                return gallery.touch.touchStart(e.touches[0].pageX);
+              });
+            }
+          };
         }
       };
     }
@@ -137,51 +160,49 @@
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('GalleryConfig', function() {
-    return {
-      _config: {
-        buffer: 2,
-        animationSpeed: 300
-      },
-      setBuffer: function(number) {
-        return this._config.buffer = parseInt(number, 10);
-      },
-      getBuffer: function() {
-        return this._config.buffer;
-      },
-      getAnimationSpeed: function() {
-        return this._config.animationSpeed;
-      },
-      getConfig: function() {
-        return this._config;
-      }
-    };
-  });
+  angular.module('cycleGallery').directive('galleryRepeater', [
+    'Finder', function(Finder) {
+      return {
+        terminal: true,
+        transclude: 'element',
+        terminal: true,
+        $$tlb: true,
+        priority: 1000,
+        link: function($scope, $element, $attr, nullController, renderFunction) {
+          var _collectionName, _matchResult, _repeatAttributes, _scopeItemName, gallery;
+          _repeatAttributes = $attr['galleryRepeater'];
+          _matchResult = _repeatAttributes.match(/^\s*(.+)\s+in\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/);
+          _scopeItemName = _matchResult[1];
+          _collectionName = _matchResult[2];
+          gallery = Finder.loadGalleryObject($element);
+          gallery.mover.setScope($scope);
+          gallery.renderer.setOptions(_scopeItemName, renderFunction);
+          return $scope.$watchCollection(_collectionName, function(items) {
+            return gallery.mover.render(items);
+          });
+        }
+      };
+    }
+  ]);
 
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('CycleGenerator', function() {
+  angular.module('cycleGallery').service('CycleGenerator', function() {
     var AUTO_INCREMENT, CycleGenerator;
     AUTO_INCREMENT = 0;
     return CycleGenerator = (function() {
-      function CycleGenerator() {}
-
-      CycleGenerator.prototype._count = 0;
-
-      CycleGenerator.prototype._items = [];
-
-      CycleGenerator.prototype._index = null;
-
-      CycleGenerator.prototype._cycleIndex = 0;
-
-      CycleGenerator.prototype._cycleItems = [];
+      function CycleGenerator() {
+        this._count = 0;
+        this._items = [];
+        this._index = null;
+        this._clearCycleParams();
+      }
 
       CycleGenerator.prototype.setItems = function(items) {
         this._items = items;
         this._count = items.length;
-        this._cycleItems = [];
-        return this._cycleIndex = 0;
+        return this._clearCycleParams();
       };
 
       CycleGenerator.prototype.setIndex = function(index) {
@@ -192,11 +213,14 @@
         var from, to;
         to = this._cycleIndex + this._index;
         from = to - count;
-        if (from >= 0) {
-          return this._cycleItems.slice(from, to);
+        if (from < 0) {
+          this._cycleGenerate(Math.ceil(from / this._count) * -1, true);
+          return this.getPrev(count);
         }
-        this._cycleGenerate(Math.ceil(from / this._count) * -1, true);
-        return this.getPrev(count);
+        if (this._cycleItems.length < to) {
+          this._cycleGenerate(Math.ceil(count / this._count), true);
+        }
+        return this._cycleItems.slice(from, to);
       };
 
       CycleGenerator.prototype.getNext = function(count) {
@@ -236,6 +260,11 @@
         return items;
       };
 
+      CycleGenerator.prototype._clearCycleParams = function() {
+        this._cycleItems = [];
+        return this._cycleIndex = 0;
+      };
+
       return CycleGenerator;
 
     })();
@@ -244,58 +273,79 @@
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('GalleryEvents', [
-    function() {
-      return {
-        _stack: {},
-        on: function(name, func) {
-          if (!this._stack[name]) {
-            this._stack[name] = [];
-          }
-          return this._stack[name].push(func);
-        },
-        "do": function(name) {
-          var func, i, len, ref, results;
-          if (this._stack[name]) {
-            ref = this._stack[name];
-            results = [];
-            for (i = 0, len = ref.length; i < len; i++) {
-              func = ref[i];
-              results.push(func());
-            }
-            return results;
-          }
-        },
-        clear: function() {
-          return this._stack = {};
-        }
+  angular.module('cycleGallery').factory('GalleryEvents', function() {
+    var GalleryEvents;
+    return GalleryEvents = (function() {
+      function GalleryEvents() {
+        this._stack = {};
+      }
+
+      GalleryEvents.prototype.on = function(name, func) {
+        var base;
+        (base = this._stack)[name] || (base[name] = []);
+        return this._stack[name].push(func);
       };
-    }
-  ]);
+
+      GalleryEvents.prototype["do"] = function(name) {
+        var base, func, i, len, ref, results;
+        (base = this._stack)[name] || (base[name] = []);
+        ref = this._stack[name];
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          func = ref[i];
+          results.push(func());
+        }
+        return results;
+      };
+
+      GalleryEvents.prototype.clear = function() {
+        return this._stack = {};
+      };
+
+      return GalleryEvents;
+
+    })();
+  });
 
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('GalleryRenderer', [
+  angular.module('cycleGallery').service('Finder', function() {
+    return {
+      loadGalleryObject: function($element) {
+        var $parent;
+        $parent = $element;
+        while (!($parent.attr('cycle-gallery'))) {
+          $parent = $parent.parent();
+          if ($element === null) {
+            new Error('There are not parent element with attribute [cycle-gallery]');
+          }
+        }
+        return $parent[0].cycleGallery;
+      }
+    };
+  });
+
+}).call(this);
+
+(function() {
+  angular.module('cycleGallery').service('GalleryRenderer', [
     'RenderedItems', function(RenderedItems) {
       var GalleryRenderer;
       return GalleryRenderer = (function() {
-        GalleryRenderer.prototype._renderedItems = new RenderedItems();
-
-        GalleryRenderer.prototype._transcludeFunction = null;
-
-        GalleryRenderer.prototype._$scope = null;
-
-        GalleryRenderer.prototype._scopeItemName = null;
-
-        GalleryRenderer.prototype._$holder = null;
-
-        function GalleryRenderer($scope, scopeItemName, $holder, transcludeFunction) {
+        function GalleryRenderer($scope) {
           this._$scope = $scope;
-          this._scopeItemName = scopeItemName;
-          this._$holder = $holder;
-          this._transcludeFunction = transcludeFunction;
+          this._renderedItems = new RenderedItems();
         }
+
+        GalleryRenderer.prototype.setOptions = function(scopeItemName, transcludeFunction) {
+          this._scopeItemName = scopeItemName;
+          return this._transcludeFunction = transcludeFunction;
+        };
+
+        GalleryRenderer.prototype.setHostElement = function($element) {
+          return this._$hostElement = $element;
+        };
 
         GalleryRenderer.prototype.render = function(items) {
           this._renderedItems.markAllOutdated();
@@ -313,7 +363,7 @@
         };
 
         GalleryRenderer.prototype.getElementByIndex = function(index) {
-          return this._$holder.children().eq(index)[0];
+          return this._$hostElement.children().eq(index)[0];
         };
 
         GalleryRenderer.prototype.getRightElementsCount = function($element) {
@@ -339,7 +389,7 @@
           return results;
         };
 
-        GalleryRenderer.prototype._updateHolder = function(items) {
+        GalleryRenderer.prototype._updateHolder = function() {
           var $itemScope, item, j, len, ref, results;
           ref = this._renderedItems.getItemsForRender();
           results = [];
@@ -358,7 +408,7 @@
 
         GalleryRenderer.prototype._appendItem = function(item, $element) {
           if (item.getIndex() === 0) {
-            return this._$holder.prepend($element);
+            return this._$hostElement.prepend($element);
           } else {
             return this._renderedItems.getElementByIndex(item.getIndex() - 1).after($element);
           }
@@ -380,37 +430,52 @@
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('ItemsStorage', [
-    'CycleGenerator', 'GalleryEvents', 'GalleryConfig', function(CycleGenerator, GalleryEvents, GalleryConfig) {
+  var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  angular.module('cycleGallery').service('ItemsStorage', [
+    'CycleGenerator', function(CycleGenerator) {
       var ItemsStorage;
       return ItemsStorage = (function() {
-        ItemsStorage.prototype._NEAREST_ITEMS = null;
-
-        ItemsStorage.prototype.items = [];
-
-        ItemsStorage.prototype.index = 0;
-
-        ItemsStorage.prototype.count = 0;
-
-        ItemsStorage.prototype._counterIndex = 0;
-
-        ItemsStorage.prototype.nextBuffer = 0;
-
-        ItemsStorage.prototype.prevBuffer = 0;
-
-        ItemsStorage.prototype.cycleMultiplier = 0;
-
-        ItemsStorage.prototype.cycler = new CycleGenerator();
-
-        function ItemsStorage() {
-          this._NEAREST_ITEMS = GalleryConfig.getBuffer();
+        function ItemsStorage(config) {
+          this.on = bind(this.on, this);
+          this.nearestItemsCount = config.bufferCount;
+          this.items = [];
+          this.index = 0;
+          this.count = 0;
+          this.nextBuffer = 0;
+          this.prevBuffer = 0;
+          this.cycler = new CycleGenerator();
+          this._counterIndex = 0;
+          this._events = {};
         }
+
+        ItemsStorage.prototype.on = function(event, callback) {
+          var base;
+          (base = this._events)[event] || (base[event] = []);
+          return this._events[event].push(callback);
+        };
+
+        ItemsStorage.prototype.trigger = function(event) {
+          var callback, i, len, ref, results;
+          if (!this._events[event]) {
+            return;
+          }
+          ref = this._events[event];
+          results = [];
+          for (i = 0, len = ref.length; i < len; i++) {
+            callback = ref[i];
+            results.push(callback.call());
+          }
+          return results;
+        };
 
         ItemsStorage.prototype.setItems = function(items) {
           this.count = items.length;
           this.items = items;
           this.cycler.setItems(this.items);
-          return this.setIndex(0);
+          if (!this.isIndexInRange()) {
+            return this.setIndex(0);
+          }
         };
 
         ItemsStorage.prototype.getNearestRange = function() {
@@ -418,7 +483,7 @@
             return [];
           }
           this.cycler.setIndex(this._counterIndex);
-          return [].concat(this.cycler.getPrev(this._NEAREST_ITEMS + this.prevBuffer), this.cycler.getNext(this._NEAREST_ITEMS + this.nextBuffer + 1));
+          return [].concat(this.cycler.getPrev(this.nearestItemsCount + this.prevBuffer), this.cycler.getNext(this.nearestItemsCount + this.nextBuffer + 1));
         };
 
         ItemsStorage.prototype.setIndex = function(index) {
@@ -435,6 +500,11 @@
           return this.index;
         };
 
+        ItemsStorage.prototype.isIndexInRange = function() {
+          var ref;
+          return (0 <= (ref = this.getIndex()) && ref <= this.count);
+        };
+
         ItemsStorage.prototype.nextIndex = function() {
           this._setItemIndex(this.index + 1);
           return this._counterIndex++;
@@ -446,7 +516,7 @@
         };
 
         ItemsStorage.prototype.getCurrentIndexInRange = function() {
-          return this._NEAREST_ITEMS + this.nextBuffer;
+          return this.nearestItemsCount + this.nextBuffer;
         };
 
         ItemsStorage.prototype.clearRangeBuffer = function() {
@@ -486,7 +556,7 @@
           index = this._fixItemIndex(index);
           if (this.index !== index) {
             this.index = index;
-            return GalleryEvents["do"]('index:update');
+            return this.trigger('change:index');
           }
         };
 
@@ -512,43 +582,32 @@
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('GalleryMover', [
-    'GalleryConfig', function(GalleryConfig) {
+  angular.module('cycleGallery').service('GalleryMover', [
+    function() {
       var GalleryMover;
       return GalleryMover = (function() {
-        GalleryMover.prototype.ANIMATION_TIME = null;
-
         GalleryMover.prototype.ANIMATION_SIDE_NEXT = 1;
 
         GalleryMover.prototype.ANIMATION_SIDE_PREV = 2;
 
-        GalleryMover.prototype._storage = null;
-
-        GalleryMover.prototype._renderer = null;
-
-        GalleryMover.prototype._holder = null;
-
-        GalleryMover.prototype._$scope = null;
-
-        GalleryMover.prototype._animation = null;
-
-        GalleryMover.prototype._checked_position = null;
-
-        GalleryMover.prototype._itemWidth = 0;
-
-        GalleryMover.prototype._necessaryIndex = 0;
-
-        GalleryMover.prototype._displayIndex = 0;
-
-        function GalleryMover(storage, renderer, holder, $scope) {
-          this.ANIMATION_TIME = GalleryConfig.getAnimationSpeed();
+        function GalleryMover(config, storage, renderer, holder) {
+          this.animationTime = config.animationTime;
           this._storage = storage;
           this._renderer = renderer;
           this._holder = holder;
-          this._$scope = $scope;
+          this._animation = null;
+          this._necessaryIndex = 0;
+          this._displayIndex = 0;
         }
 
+        GalleryMover.prototype.setScope = function($scope) {
+          return this._$scope = $scope;
+        };
+
         GalleryMover.prototype.render = function(items) {
+          if (items == null) {
+            items = [];
+          }
           this._storage.setItems(items);
           this._renderer.render(this._storage.getNearestRange());
           this._holder.update();
@@ -646,7 +705,7 @@
           if (!this._animationStartTime) {
             this._animationStartTime = timestamp;
           }
-          return this.ANIMATION_TIME - (timestamp - this._animationStartTime);
+          return this.animationTime - (timestamp - this._animationStartTime);
         };
 
         GalleryMover.prototype._clearAnimationTime = function() {
@@ -786,25 +845,16 @@
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('RenderedItem', function() {
+  angular.module('cycleGallery').service('RenderedItem', function() {
     var RenderedItem;
     return RenderedItem = (function() {
-      RenderedItem.prototype._index = null;
-
-      RenderedItem.prototype._data = null;
-
-      RenderedItem.prototype._element = null;
-
-      RenderedItem.prototype._scope = null;
-
-      RenderedItem.prototype._outdate = null;
-
-      RenderedItem.prototype._rendered = false;
-
       function RenderedItem(index, data) {
         this._index = index;
         this._data = data;
         this._outdate = false;
+        this._rendered = false;
+        this._element = null;
+        this._scope = null;
       }
 
       RenderedItem.prototype.getIndex = function() {
@@ -861,13 +911,13 @@
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('RenderedItems', [
+  angular.module('cycleGallery').factory('RenderedItems', [
     'RenderedItem', function(RenderedItem) {
       var RenderedItems;
       return RenderedItems = (function() {
-        function RenderedItems() {}
-
-        RenderedItems.prototype._items = [];
+        function RenderedItems() {
+          this._items = [];
+        }
 
         RenderedItems.prototype.addItem = function(index, data) {
           var item, j, len, ref;
@@ -955,21 +1005,15 @@
 (function() {
   var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  angular.module('multiGallery').service('Resize', function() {
+  angular.module('cycleGallery').factory('Resize', function() {
     var Resize;
     return Resize = (function() {
-      Resize.prototype.mover = null;
-
-      Resize.prototype.holder = null;
-
-      Resize.prototype.resizeTimeout = 0;
-
-      Resize.prototype.resizeDelay = 0;
-
       function Resize(mover, holder) {
         this["do"] = bind(this["do"], this);
         this.mover = mover;
         this.holder = holder;
+        this.resizeTimeout = 0;
+        this.resizeDelay = 25;
       }
 
       Resize.prototype["do"] = function() {
@@ -994,12 +1038,10 @@
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('ResizeEmulator', [
-    '$window', function($window) {
-      var Action, ResizeEmulator;
-      ResizeEmulator = (function() {
-        ResizeEmulator._storage = [];
-
+  angular.module('cycleGallery').factory('ResizeEmulator', [
+    'ResizeEmulatorAction', '$window', function(ResizeEmulatorAction, $window) {
+      var ResizeEmulator;
+      return ResizeEmulator = (function() {
         function ResizeEmulator() {
           this._storage = [];
           angular.element($window).bind('resize orientationchange', (function(_this) {
@@ -1022,13 +1064,12 @@
           }
         };
 
-        ResizeEmulator.prototype.bind = function(fn, key) {
+        ResizeEmulator.prototype.bind = function(callback, key) {
           var action;
-          action = this.actionExists(key);
-          if (action) {
-            return action.fn = fn;
+          if (action = this.actionExists(key)) {
+            return action.fn = callback;
           } else {
-            action = new Action(fn, key);
+            action = new ResizeEmulatorAction(callback, key);
             return this._storage.push(action);
           }
         };
@@ -1046,57 +1087,38 @@
         };
 
         ResizeEmulator.prototype.unbind = function(key) {
-          return this._storage[key] = [];
+          var base;
+          return (base = this._storage)[key] || (base[key] = []);
         };
 
         return ResizeEmulator;
 
       })();
-      Action = (function() {
-        Action.key = null;
-
-        Action.fn = null;
-
-        function Action(fn, key) {
-          this.fn = fn;
-          this.key = key;
-        }
-
-        Action.prototype.apply = function() {
-          return this.fn.call();
-        };
-
-        return Action;
-
-      })();
-      if (!window.resizeEmulator) {
-        return window.resizeEmulator = new ResizeEmulator();
-      }
     }
   ]);
 
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('MoverHolder', function() {
+  angular.module('cycleGallery').service('MoverHolder', function() {
     var MoverHolder;
     return MoverHolder = (function() {
-      MoverHolder.prototype._$holder = null;
-
-      MoverHolder.prototype._itemWidth = 0;
-
-      MoverHolder.prototype._position_lock = null;
-
-      function MoverHolder($holder) {
-        this._$holder = $holder;
+      function MoverHolder() {
+        this._$hostElement = null;
+        this._itemWidth = 0;
+        this._position_lock = null;
       }
+
+      MoverHolder.prototype.setElement = function($element) {
+        return this._$hostElement = $element;
+      };
 
       MoverHolder.prototype.update = function() {
         return this.getItemWidth(false);
       };
 
       MoverHolder.prototype.getElement = function() {
-        return this._$holder;
+        return this._$hostElement;
       };
 
       MoverHolder.prototype.getDisplayIndex = function() {
@@ -1111,18 +1133,18 @@
         if (this._itemWidth && cached) {
           return this._itemWidth;
         }
-        $element = this._$holder.children().eq(0);
+        $element = this._$hostElement.children().eq(0);
         if ($element[0]) {
           return this._itemWidth = $element[0].offsetWidth;
         }
       };
 
       MoverHolder.prototype.getCurrentPosition = function() {
-        return parseInt(this._$holder.css('left'), 10);
+        return parseInt(this._$hostElement.css('left'), 10);
       };
 
       MoverHolder.prototype.setPosition = function(position) {
-        return this._$holder.css('left', position + 'px');
+        return this._$hostElement.css('left', position + 'px');
       };
 
       MoverHolder.prototype.getSlideDiff = function() {
@@ -1155,25 +1177,9 @@
 }).call(this);
 
 (function() {
-  angular.module('multiGallery').service('MoverTouch', function() {
+  angular.module('cycleGallery').service('MoverTouch', function() {
     var MoverTouch;
     return MoverTouch = (function() {
-      MoverTouch.prototype._mover = null;
-
-      MoverTouch.prototype._storage = null;
-
-      MoverTouch.prototype._holder = null;
-
-      MoverTouch.prototype._trigger = false;
-
-      MoverTouch.prototype._start_position = 0;
-
-      MoverTouch.prototype._last_position = 0;
-
-      MoverTouch.prototype._last_track_time = null;
-
-      MoverTouch.prototype._last_track_position = null;
-
       MoverTouch.prototype.TRACK_TIME = 150;
 
       MoverTouch.prototype.MIN_POSITION_CHANGE = 30;
@@ -1181,6 +1187,11 @@
       function MoverTouch(mover, holder) {
         this._mover = mover;
         this._holder = holder;
+        this._trigger = false;
+        this._start_position = 0;
+        this._last_position = 0;
+        this._last_track_time = null;
+        this._last_track_position = null;
       }
 
       MoverTouch.prototype.touchStart = function(position) {
@@ -1280,5 +1291,27 @@
 
     })();
   });
+
+}).call(this);
+
+(function() {
+  angular.module('cycleGallery').service('ResizeEmulatorAction', [
+    function() {
+      var ResizeEmulatorAction;
+      return ResizeEmulatorAction = (function() {
+        function ResizeEmulatorAction(fn, key) {
+          this.fn = fn;
+          this.key = key;
+        }
+
+        ResizeEmulatorAction.prototype.apply = function() {
+          return this.fn.call();
+        };
+
+        return ResizeEmulatorAction;
+
+      })();
+    }
+  ]);
 
 }).call(this);
