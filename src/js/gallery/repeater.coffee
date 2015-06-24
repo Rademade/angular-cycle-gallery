@@ -1,5 +1,5 @@
 angular.module('cycleGallery').directive 'galleryRepeater', [
-  'Finder', (Finder)->
+  'Finder', (Finder) ->
 
     terminal: true
     transclude : 'element'

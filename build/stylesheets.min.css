@@ -1,0 +1,154 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+html {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+q, blockquote {
+  quotes: none;
+}
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
+}
+
+a img {
+  border: none;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+  display: block;
+}
+
+body {
+  background-color: #fff;
+  width: 100%;
+}
+
+h2 {
+  font-size: 24px;
+  padding: 12px;
+  margin-top: 50px;
+}
+
+hr {
+  clear: both;
+  padding: 20px;
+}
+
+div.clear {
+  clear: both;
+}
+
+.gallery-wrapper {
+  position: relative;
+  width: 75%;
+  height: 75%;
+  overflow: hidden;
+  border: 1px solid #000;
+  margin: 0 auto;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.gallery-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  white-space: nowrap;
+}
+
+.action-button {
+  height: 20px;
+}
+.action-button.next {
+  position: absolute;
+  top: 10%;
+  right: 10px;
+}
+.action-button.prev {
+  position: absolute;
+  top: 10%;
+  left: 10px;
+}
+.action-button.animate {
+  top: 50%;
+}
+
+.gallery-item {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #000;
+}
+.gallery-item .gallery-item-content {
+  text-align: center;
+  font-size: 22px;
+  width: 100%;
+  height: 100%;
+}
+
+.numbers-wrapper {
+  position: relative;
+  width: 150px;
+  height: 100px;
+  overflow: hidden;
+  border: 1px solid #000;
+  margin: 0 auto 100px auto;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.action-number {
+  position: absolute;
+  height: 20px;
+  top: 80%;
+}
+.action-number.next {
+  right: 10px;
+}
+.action-number.prev {
+  left: 10px;
+}

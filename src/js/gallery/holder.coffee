@@ -1,6 +1,6 @@
 angular.module('cycleGallery').directive 'cycleGalleryHolder', [
   'Finder',
-  (Finder)->
+  (Finder) ->
 
     compile: ($scope, $element) ->
       pre: ($scope, $element) ->
