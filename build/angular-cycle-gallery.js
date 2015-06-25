@@ -315,9 +315,9 @@
       loadGalleryObject: function($element) {
         var $parent;
         $parent = $element;
-        while (!($parent.attr('cycle-gallery'))) {
+        while ($parent.attr('cycle-gallery') === void 0) {
           $parent = $parent.parent();
-          if ($element === null) {
+          if ($parent[0] === void 0) {
             new Error('There are not parent element with attribute [cycle-gallery]');
           }
         }
@@ -825,12 +825,19 @@
 
         GalleryMover.prototype._animationRender = function() {
           this._renderer.render(this._storage.getNearestRange());
-          return this._$scope.$apply();
+          return this._scopeApply();
         };
 
         GalleryMover.prototype._rerender = function() {
           this._renderer.render(this._storage.getNearestRange());
           this._applyPositionForNecessaryIndex();
+          return this._scopeApply();
+        };
+
+        GalleryMover.prototype._scopeApply = function() {
+          if (!this._$scope) {
+            return;
+          }
           if (!this._$scope.$$phase) {
             return this._$scope.$apply();
           }

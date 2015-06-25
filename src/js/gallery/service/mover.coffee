@@ -201,11 +201,16 @@ angular.module('cycleGallery').service 'GalleryMover', [
 
       _animationRender: ->
         @_renderer.render( @_storage.getNearestRange() )
-        @_$scope.$apply()
+        @_scopeApply()
 
       _rerender: ->
         @_renderer.render( @_storage.getNearestRange() )
         @_applyPositionForNecessaryIndex()
+        @_scopeApply()
+
+      _scopeApply: ->
+        return unless @_$scope
         @_$scope.$apply() unless @_$scope.$$phase
+
 
 ]
