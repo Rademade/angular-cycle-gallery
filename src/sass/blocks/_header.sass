@@ -1,0 +1,30 @@
+.header
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  padding: em(20) em(20) em(10) em(20)
+  text-align: center
+  box-sizing: border-box
+  +clear
+
+  .header-nav
+    display: inline-block
+    +clear
+
+    .header-nav-item
+      float: left
+      margin: 0 em(10) em(10) em(10)
+      
+    .header-nav-link
+      color: rgba(255,255,255,0.8)
+      font-size: em(18)
+      transition: border 0.3s ease-in-out
+      border-bottom: .08em solid transparent
+      +lato
+
+      &:hover
+        border-bottom: .08em solid rgba(255,255,255,0.6)
+
+      &.is-active
+        border-bottom: .08em solid rgba(255,255,255,0.6)

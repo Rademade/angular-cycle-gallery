@@ -17,11 +17,11 @@ app.config([
       templateUrl: 'views/index.html'
 
     .state 'public.animation',
-      url: 'about',
+      url: 'animation_example',
       templateUrl: 'views/animation.html'
 
     .state 'public.simple',
-      url: 'about',
+      url: 'simple_example',
       templateUrl: 'views/simple.html'
 
     $urlRouterProvider.otherwise '/'
