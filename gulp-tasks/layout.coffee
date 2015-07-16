@@ -25,3 +25,9 @@ build = (sources, dir_path)->
     )
     .pipe rename('index.html')
     .pipe gulp.dest(dir_path)
+
+gulp.task 'templates', ->
+  gulp
+    .src('src/templates/**/*.jade')
+    .pipe jade()
+    .pipe gulp.dest('public/')

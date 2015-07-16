@@ -1,6 +1,39 @@
-app = angular.module('app', ['cycleGallery'])
+app = angular.module('app', ['ui.router','cycleGallery'])
 
-app.controller 'AppController', ($scope) ->
+app.config([
+  '$stateProvider', '$urlRouterProvider', '$locationProvider',
+  ($stateProvider, $urlRouterProvider, $locationProvider) ->
+
+    $stateProvider
+
+    .state 'public',
+      abstract: true,
+      url: '/',
+      templateUrl: 'layout/main.html',
+      # controller: 'LayoutController'
+
+    .state 'public.index',
+      url: '',
+      templateUrl: 'views/index.html'
+
+    .state 'public.animation',
+      url: 'about',
+      templateUrl: 'views/animation.html'
+
+    .state 'public.simple',
+      url: 'about',
+      templateUrl: 'views/simple.html'
+
+    $urlRouterProvider.otherwise '/'
+
+    $locationProvider.html5Mode
+      enabled: true
+      requireBase: false
+      html5Mode: true
+
+])
+
+app.controller 'GalleryController', ($scope) ->
 
   $scope.otherItems = [
     {text: 'First'}

@@ -1,6 +1,6 @@
 file_manager      = require './file_manager.coffee'
 gulp              = require 'gulp'
-compass           = require 'gulp-compass'
+sass              = require 'gulp-sass'
 concat            = require 'gulp-concat'
 minifyCSS         = require 'gulp-minify-css'
 plumber           = require 'gulp-plumber'
@@ -26,11 +26,9 @@ compileStylesheets = (build_directory, name, opts = {}) ->
 
   stream = gulp
     .src("#{file_manager.source}/sass/#{file_name}.sass")
-    .pipe compass(
-      css: build_directory
-      sass: "#{file_manager.source}/sass"
-      path: '/'
-      image: "#{build_directory}/images"
+    .pipe sass(
+      indentedSyntax: true
+      cache: false
       sourcemap: no,
       bundle_exec: yes
     )

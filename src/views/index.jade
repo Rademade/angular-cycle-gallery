@@ -1,42 +1,11 @@
 html(ng-app="app")
-    head
-        title Angular Multi Gallery
-        meta(charset="utf8")
-        meta(name='viewport', content='width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=none')
-        <!-- inject:css -->
-        <!-- endinject -->
-    body(ng-controller="AppController")
-
-        h2 1. Gallery example
-        div.gallery-wrapper(
-            cycle-gallery
-            gallery-init="onGalleryInit"
-            config-buffer="2"
-            config-animation-time="250"
-            gallery-index="baseIndex"
-            ng-show="showGallery"
-        )
-            div.gallery-slider(cycle-gallery-holder)
-                div.gallery-item(gallery-repeater="item in gallery" ng-style="{'background-color':item.color}")
-                    div.gallery-item-content()
-                        h1() {{item.text}}
-            button.action-button.next(gallery-button="next") next
-            button.action-button.prev(gallery-button="prev") prev
-            button.action-button.next.animate(gallery-button="animateNext") Animate next
-            button.action-button.prev.animate(gallery-button="animatePrev") Animate prev
-
-        div.control-panel()
-            h3() Current index {{baseIndex}}
-            button(ng-click="toggleGallery()") Toggl gallery
-            button(ng-click="add()") Add item
-
-        h2 2. Gallery. Simple version
-        div.numbers-wrapper(cycle-gallery config-buffer="5")
-            div.gallery-slider(cycle-gallery-holder)
-                div.gallery-item(gallery-repeater="item in otherItems")
-                    div.item-content() {{item.text}}
-            button.action-number.next(gallery-button="next") next
-            button.action-number.prev(gallery-button="prev") prev
-
-        <!-- inject:js -->
-        <!-- endinject -->
+  head
+    title Angular Multi Gallery
+    meta(charset="utf8")
+    meta(name='viewport', content='width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=none')
+    <!-- inject:css -->
+    <!-- endinject -->
+        
+  body(ui-view="")
+    <!-- inject:js -->
+    <!-- endinject -->

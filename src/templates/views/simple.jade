@@ -1,0 +1,21 @@
+div(ng-controller="GalleryController")
+  div.gallery-wrapper(
+      cycle-gallery
+      gallery-init="onGalleryInit"
+      config-buffer="2"
+      config-animation-time="250"
+      gallery-index="baseIndex"
+      ng-show="showGallery"
+  )
+      div.gallery-slider(cycle-gallery-holder)
+          div.gallery-item(gallery-repeater="item in gallery" ng-style="{'background-color':item.color}")
+              div.gallery-item-content()
+                  h1() {{item.text}}
+                  
+      button.action-button.next(gallery-button="next") next
+      button.action-button.prev(gallery-button="prev") prev
+
+  div.control-panel()
+      h3() Current index {{baseIndex}}
+      button(ng-click="toggleGallery()") Toggl gallery
+      button(ng-click="add()") Add item
