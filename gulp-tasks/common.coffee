@@ -12,6 +12,7 @@ gulp.task 'watch', ->
   gulp.watch "#{file_manager.source}/js/application/**/*",  ['javascript:application']
   gulp.watch "#{file_manager.source}/js/gallery/**/*",      ['javascript:library']
   gulp.watch "#{file_manager.source}/views/**/*",           ['layout']
+  gulp.watch "#{file_manager.source}/templates/**/*",       ['templates']
 
 gulp.task 'server', ->
   nodemon
