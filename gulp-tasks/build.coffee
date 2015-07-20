@@ -9,4 +9,5 @@ gulp.task 'build:development', ['clean'], ->
   gulp.start ['javascript'], ->
     gulp.start ['stylesheets'], ->
       gulp.start ['layout'], ->
+      gulp.start ['templates'], ->
         console.log('Development build finished')

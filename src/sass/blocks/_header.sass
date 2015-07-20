@@ -1,0 +1,35 @@
+.header
+  position: absolute
+  z-index: 2
+  top: 0
+  left: 0
+  width: 100%
+  padding: em(20) em(20) em(10) em(20)
+  text-align: center
+  box-sizing: border-box
+  +clear
+  &.white
+    .header-nav
+      .header-nav-link
+        color: #fff
+        &:hover,
+        &.is-active
+          border-bottom: .08em solid rgba(255,255,255,0.6)
+  .header-nav
+    display: inline-block
+    +clear
+
+    .header-nav-item
+      float: left
+      margin: 0 em(10) em(10) em(10)
+      
+    .header-nav-link
+      color: #333
+      font-size: em(16)
+      transition: border 0.3s ease-in-out
+      border-bottom: .08em solid transparent
+
+      &:hover
+        border-bottom: .08em solid rgba(51,51,51,0.6)
+      &.is-active
+        border-bottom: .08em solid rgba(51,51,51,0.6)

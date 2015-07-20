@@ -1,94 +1,14 @@
-@import "compass/reset"
-@import "compass/css3/transition"
+/*=== Reset ===*/
+@import "base/reset"
 
-body
-    background-color: #fff
-    width: 100%
+/*==== Mixins ====*/
+@import "mixins/import"
 
-h2
-    font-size: 24px
-    padding: 12px
-    margin-top: 50px
+/*=== Base ===*/
+@import "base/import"
 
-hr
-    clear: both
-    padding: 20px
+/*=== Library ===*/
+@import "blocks/import"
 
-div.clear
-    clear: both
-
-.gallery-wrapper
-    position: relative
-    width:  75%
-    height: 75%
-    overflow: hidden
-    border: 1px solid #000
-    margin: 0 auto
-    -webkit-touch-callout: none
-    -webkit-user-select: none
-    -khtml-user-select: none
-    -moz-user-select: none
-    -ms-user-select: none
-    user-select: none
-
-.gallery-slider
-    position: relative
-    width: 100%
-    height: 100%
-    white-space: nowrap
-
-.action-button
-    height: 20px
-
-    &.next
-        position: absolute
-        top: 10%
-        right: 10px
-
-    &.prev
-        position: absolute
-        top: 10%
-        left: 10px
-
-    &.animate
-        top: 50%
-
-.gallery-item
-    display: inline-block
-    width: 100%
-    height: 100%
-    border: 1px solid #000
-
-    .gallery-item-content
-        text-align: center
-        font-size: 22px
-        width: 100%
-        height: 100%
-
-
-// Second one
-
-.numbers-wrapper
-    position: relative
-    width: 150px
-    height: 100px
-    overflow: hidden
-    border: 1px solid #000
-    margin: 0 auto 100px auto
-    -webkit-touch-callout: none
-    -webkit-user-select: none
-    -khtml-user-select: none
-    -moz-user-select: none
-    -ms-user-select: none
-    user-select: none
-
-.action-number
-    position: absolute
-    height: 20px
-    top: 80%
-
-    &.next
-        right: 10px
-
-    &.prev
-        left: 10px
+/*=== Library ===*/
+@import "library/import"

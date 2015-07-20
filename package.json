@@ -11,7 +11,6 @@
     "gulp": "^3.8.10",
     "gulp-batch": "^1.0.4",
     "gulp-coffee": "^2.2.0",
-    "gulp-compass": "^2.0.3",
     "gulp-concat": "^2.5.2",
     "gulp-inject": "^1.1.1",
     "gulp-jade": "^0.10.0",

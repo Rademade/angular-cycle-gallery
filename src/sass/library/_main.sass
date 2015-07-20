@@ -1,0 +1,96 @@
+.gallery-wrapper
+  position: absolute
+  z-index: 1
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  overflow: hidden
+  margin: 0 auto
+  -webkit-touch-callout: none
+  -webkit-user-select: none
+  -khtml-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+
+.gallery-slider
+  position: relative
+  width: 100%
+  height: auto
+  white-space: nowrap
+
+.action-button
+  position: absolute
+  z-index: 3
+  top: 0
+  width: 50%
+  height: 100%
+  border: 0
+  text-indent: -200%
+  background: none
+  outline: none
+  cursor: pointer
+
+  &.next
+    right: 0
+
+  &.prev
+    left: 0
+
+.gallery-overflow
+  position: absolute
+  z-index: 2
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  background-color: rgba(0, 0, 0, 0.6)
+
+.gallery-item
+  position: relative
+  display: inline-block
+  width: 100%
+  height: 100%
+  background-position: top center
+  -webkit-background-size: cover
+  background-size: cover
+
+  .gallery-item-text
+    position: absolute
+    z-index: 3
+    color: #fff
+    bottom: em(20)
+    width: 100%
+    font-size: em(50)
+    text-align: center
+    font-weight: 300
+    +lato
+
+
+// Second one
+
+.numbers-wrapper
+  position: relative
+  width: 150px
+  height: 100px
+  overflow: hidden
+  border: 1px solid #000
+  margin: 0 auto 100px auto
+  -webkit-touch-callout: none
+  -webkit-user-select: none
+  -khtml-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+
+.action-number
+  position: absolute
+  height: 20px
+  top: 80%
+
+  &.next
+    right: 10px
+
+  &.prev
+    left: 10px
