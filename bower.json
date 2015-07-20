@@ -12,6 +12,9 @@
   	"build/angular-cycle-gallery.min.js",
   	"build/stylesheets.min.css"
   ],
+  "devDependencies": {
+    "angular-ui-router": "~0.2.15"
+  },
   "dependencies": {
     "angular": "~1.2.12",
     "gsap": "~1.16.0"
