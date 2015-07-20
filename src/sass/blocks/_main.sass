@@ -2,7 +2,26 @@
   display: table
   width: 100%
   height: 100vh
+  
+.link-box
+  margin-top: em(25)
+  &:first-child
+    margin-top: em(50)
 
+.main-box-link
+  display: inline-block
+  margin: 0 em(10)
+  padding: 0 em(10)
+  color: #fff
+  font-size: em(16)
+  height: em(36)
+  line-height: em(34)
+  border: .08em solid #fff
+  border-radius: em(4)
+  opacity: 0.8
+  +lato
+  &:hover
+    opacity: 0.9
 .main-box-data
   display: table-cell
   width: 100%
@@ -16,6 +35,7 @@
   letter-spacing: em(2)
   font-weight: normal
   text-transform: uppercase
+
 .main-title-description
   font-size: em(30)
   color: #fff

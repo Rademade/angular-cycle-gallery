@@ -16,11 +16,17 @@ app.config([
       url: '',
       templateUrl: 'views/index.html'
 
-    .state 'public.animation',
+
+    .state 'example',
+      abstract: true,
+      url: '/',
+      templateUrl: 'layout/example.html'
+
+    .state 'example.animation',
       url: 'animation_example',
       templateUrl: 'views/animation.html'
 
-    .state 'public.simple',
+    .state 'example.simple',
       url: 'simple_example',
       templateUrl: 'views/simple.html'
 
@@ -41,17 +47,15 @@ app.controller 'GalleryController', ($scope) ->
   ]
 
   $scope.gallery = [
-    {text: 'Item 1', color: 'red'}
-    {text: 'Item 2', color: 'blue'}
-    {text: 'Item 3', color: 'green'}
-    {text: 'Item 4', color: 'yellow'}
-    {text: 'Item 5', color: 'black'}
-    {text: 'Item 6', color: 'grey'}
-    {text: 'Item 7', color: 'purple'}
-    {text: 'Item 8', color: 'darkgreen'}
-    {text: 'Item 9', color: 'darkblue'}
-    {text: 'Item 10', color: 'yellow'}
-    {text: 'Item 11', color: 'darkgrey'}
+    {text: 'Item 1', sref: 'http://wfiles.brothersoft.com/a/alpine-mountain-austria_107989-1600x1200.jpg'}
+    {text: 'Item 2', sref: 'http://wfiles.brothersoft.com/a/alpine-mountain-austria_107989-1600x1200.jpg'}
+    {text: 'Item 3', sref: 'http://www.jpegwallpapers.com/images/wallpapers/Mountain-466704.jpeg'}
+    {text: 'Item 4', sref: 'http://www.mrwallpaper.com/wallpapers/summer-mountain-lake-1600x1200.jpg'}
+    {text: 'Item 5', sref: 'http://wfiles.brothersoft.com/i/iceland_mountain_and_lake_37299-1600x1200.jpg'}
+    {text: 'Item 6', sref: 'http://www.photography-match.com/views/images/gallery/Mountain_Mist_Alberta_Canada___1600x1200___ID_.jpg'}
+    {text: 'Item 7', sref: 'http://www.pcwalls.net/download/mountain_lake_wallpaper_7-1600x1200.jpg'}
+    {text: 'Item 8', sref: 'http://www.wallpaper77.com/upload/DesktopWallpapers/cache/Top-of-Mountain-landscape-mountain-1600x1200.jpg'}
+    {text: 'Item 9', sref: 'http://www.mrwallpaper.com/wallpapers/Mountain-scenery-1600x1200.jpg'}
   ]
 
   $scope.baseIndex = 5
