@@ -407,6 +407,7 @@
         }
 
         ItemsStorage.prototype.setItems = function(items) {
+          if(!items){return;};
           this.count = items.length;
           this.items = items;
           this.cycler.setItems(this.items);

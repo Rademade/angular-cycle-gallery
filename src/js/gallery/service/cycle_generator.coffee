@@ -13,6 +13,7 @@ angular.module('multiGallery').service 'CycleGenerator', ->
     _cycleItems: []
 
     setItems: (items)->
+      return unless items
       @_items = items
       @_count = items.length
       @_cycleItems = []
