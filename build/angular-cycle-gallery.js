@@ -71,13 +71,13 @@
           });
           window.resizeEmulator.bind(resize["do"], 1);
           _$holder.on('touchstart', function(e) {
-            return touch.touchStart(e.touches[0].pageX);
+            return touch.touchStart(e.originalEvent.touches[0].pageX);
           });
           _$body.on('touchend', function(e) {
             return touch.touchEnd();
           });
           _$body.on('touchmove', function(e) {
-            return touch.touchMove(e.touches[0].pageX);
+            return touch.touchMove(e.originalEvent.touches[0].pageX);
           });
           $rootScope.setGalleryIndex = function(index) {
             return mover.setIndex(index - 0);
@@ -89,24 +89,6 @@
             return $scope[_galleryIndexName] = storage.getIndex();
           };
           return updateIndex();
-        }
-      };
-    }
-  ]);
-
-}).call(this);
-
-(function() {
-  angular.module('multiGallery').directive('galleryConfigBuffer', [
-    'GalleryConfig', function(GalleryConfig) {
-      return {
-        restrict: 'A',
-        compile: function(scope, $element) {
-          return {
-            pre: function(scope, $element, attr) {
-              return GalleryConfig.setBuffer(attr.galleryConfigBuffer);
-            }
-          };
         }
       };
     }
@@ -178,6 +160,9 @@
       CycleGenerator.prototype._cycleItems = [];
 
       CycleGenerator.prototype.setItems = function(items) {
+        if (!items) {
+          return;
+        }
         this._items = items;
         this._count = items.length;
         this._cycleItems = [];
@@ -407,7 +392,9 @@
         }
 
         ItemsStorage.prototype.setItems = function(items) {
-          if(!items){return;};
+          if (!items) {
+            return;
+          }
           this.count = items.length;
           this.items = items;
           this.cycler.setItems(this.items);
@@ -1073,6 +1060,24 @@
       if (!window.resizeEmulator) {
         return window.resizeEmulator = new ResizeEmulator();
       }
+    }
+  ]);
+
+}).call(this);
+
+(function() {
+  angular.module('multiGallery').directive('galleryConfigBuffer', [
+    'GalleryConfig', function(GalleryConfig) {
+      return {
+        restrict: 'A',
+        compile: function(scope, $element) {
+          return {
+            pre: function(scope, $element, attr) {
+              return GalleryConfig.setBuffer(attr.galleryConfigBuffer);
+            }
+          };
+        }
+      };
     }
   ]);
 

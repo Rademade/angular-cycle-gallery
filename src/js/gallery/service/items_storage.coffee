@@ -22,6 +22,7 @@ angular.module('multiGallery').service 'ItemsStorage', [
         @_NEAREST_ITEMS = GalleryConfig.getBuffer()
 
       setItems: (items) ->
+        return unless items
         @count = items.length
         @items = items
         @cycler.setItems(@items)
