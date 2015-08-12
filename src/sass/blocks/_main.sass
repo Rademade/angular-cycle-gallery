@@ -1,9 +1,16 @@
 .main-box
   display: table
+  padding: 0 150px
   width: 100%
   height: 100vh
+  box-sizing: border-box
+  @media all and (max-width: 550px)
+    padding: 0 75px
+
   
 .link-box
+  position: relative
+  z-index: 4
   margin-top: em(25)
   &:first-child
     margin-top: em(50)
@@ -30,22 +37,33 @@
   vertical-align: middle
 
 .main-title
+  position: relative
+  z-index: 2
   margin-bottom: em(10)
   font-size: em(50)
   letter-spacing: em(2)
   font-weight: normal
   text-transform: uppercase
+  @media all and (max-width: 550px)
+    font-size: 18px
+    line-height: 22px
 
 .main-title-description
   font-size: em(30)
   color: #fff
   font-weight: 300
 
+  @media all and (max-width: 550px)
+    font-size: 16px
+  span
+    position: relative
+    z-index: 2
   a
+    position: relative
+    z-index: 4
     color: #fff
     font-weight: 300
     +lato
-
 
 .content-box
   padding: em(100) em(30)

@@ -1,3 +1,44 @@
+.content-box
+
+  &.fix
+    .gallery-wrapper
+      position: relative
+      width: 80%
+      padding-bottom: 50%
+      height: auto
+
+    .gallery-slider
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+
+    .control-panel
+      margin: 0 auto
+      padding: 20px 0
+      width: 80%
+      text-align: center
+      h3
+        margin-bottom: 20px
+      
+      button
+        display: inline-block
+        min-width: 95px
+        margin: 0 10px
+        padding: 0 10px
+        vertical-align: top
+        outline: none
+        background: none
+        color: #ffffff
+        font-size: 12px
+        height: 30px
+        line-height: 30px
+        cursor: pointer
+        border: 1px solid #fff
+        border-radius: 3px
+        box-sizing: border-box
+
 .gallery-wrapper
   position: absolute
   z-index: 1
@@ -13,9 +54,14 @@
   -moz-user-select: none
   -ms-user-select: none
   user-select: none
+  &.in-index
+    .gallery-overflow
+      background-color: rgba(0, 0, 0, 0.8)
+
 
 .gallery-slider
   position: relative
+  z-index: 1
   width: 100%
   height: auto
   white-space: nowrap
@@ -27,16 +73,30 @@
   width: 50%
   height: 100%
   border: 0
-  text-indent: -200%
+  text-indent: -9999px
   background: none
   outline: none
   cursor: pointer
+  &:after
+    position: absolute
+    content: ''
+    top: 50%
+    width: 32px
+    height: 32px
+    background-size: 32px 32px
+    background-repeat: no-repeat
 
   &.next
     right: 0
+    &:after
+      right: 50px
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABqElEQVR4Xt3b7U3AMAyE4csGbAIjwCQwAkwAm8AGsAGMwCgwgVGlIiHER+048V36u031PqpaqVYakg4zOwHwCOCmtfaatOzwZVrGHfb4ZwBnAN4AXKggdAN8i//0lEHoAvglXgohDPBPvAxCCOBgvASCG8AZT48QAbgDcBv4elC+GN0AW7iZPQC4XAEhBLASQhhgFYQugBUQugHUEVIAlBHSAFQRUgEUEdIB1BCGACghDANQQRgKoIAwHIAdYQoAM8I0AFaEqQCMCNMB2BBKAJgQygBYEEoBGBDKAaoRKAAqEWgAqhCoACoQGAHuAVwFZg7vAM69Y3kqADObGr8h0wBUxNMAVMVTAFTGlwNUx5cCMMSXAbDElwAwxU8HYIufCsAYPw2ANX4KAHP8cAD2+KEACvHDAFTihwAoxacDqMWnAijGpwGoxqcAKMd3A6jHdwGsEB8GWCU+BGBm0Q0Tof/2gfmA6xL3b/F9y8wLgFPHnSjjQ0/APr7adokeRaCNDwM4EKjjuwAOINDHdwP8gSARnwLwA4JMfBrAF4QnANfeEbXja5J+6gcWEX5QlySXfwAAAABJRU5ErkJggg==')
 
   &.prev
     left: 0
+    &:after
+      left: 50px
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABqUlEQVR4Xt3b0U3EMBCE4XEFUAolHB0clUFHUAJ0cldBkKUgnRDh7PWsd9Z5Tpz8nyxFspOCJMe2bU8AXgG8lFIurMcurIE8x9nj3wE8AvgE8MxCkAf4Ff/jTEOQBjiIpyLIAtyJpyFIAjTGUxDkADrjhxGkAIzxQwgyAIPxZgQJAFJ8RbgCOJVS6muy6QgHiIyvQqEA0fGhAArxYQAq8SEASvHTAdTipwIoxk8DUI2fAqAc7w6gHu8KkCHeDSBLvAtApng6QLZ4KkDGeBpA1ngKQOb4YYDs8UMAK8SbAVaJNwGsFN8NsFq8FeADwEPTmvPxSXV/v25xNy9fD97v8PLuVeF9FiyD0A1QKVdCMAGshGAGWAVhCGAFhGGA7AgUgMwINICsCFSAjAh0gGwILgCZENwAsiC4AmRAcAdQR5gCoIwwDUAVYSqAIsJ0ADWEEAAlhDAAFYRQAAWEcIBoBAkAIsLX/rV48291MgAEhO747o0Rr82J23GNS+6meEkAw0wwx8sCdCAMxUsDNCAMx8sD/INAiU8B8AcCLT4NwA3CG4Az68/xOu43keZ+UGLOkN4AAAAASUVORK5CYII=')
 
 .gallery-overflow
   position: absolute

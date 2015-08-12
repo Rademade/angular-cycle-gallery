@@ -16,7 +16,6 @@ app.config([
       url: '',
       templateUrl: 'views/index.html'
 
-
     .state 'example',
       abstract: true,
       url: '/',
@@ -29,6 +28,10 @@ app.config([
     .state 'example.simple',
       url: 'simple_example',
       templateUrl: 'views/simple.html'
+
+    .state 'example.fix',
+      url: 'fix',
+      templateUrl: 'views/fix.html'
 
     $urlRouterProvider.otherwise '/'
 

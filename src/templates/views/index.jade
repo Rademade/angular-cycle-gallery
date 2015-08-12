@@ -1,9 +1,24 @@
 div.main-box
+  div(ng-controller="GalleryController")
+    div.gallery-wrapper.in-index(
+    cycle-gallery
+    gallery-init="onGalleryInit"
+    config-buffer="2"
+    config-animation-time="250"
+    gallery-index="baseIndex"
+    ng-show="showGallery"
+    )
+      div.gallery-slider(cycle-gallery-holder)
+        div.gallery-item(gallery-repeater="item in gallery" style="background-image: url({{item.sref}});")
+      i.gallery-overflow
+      button.action-button.next.animate(gallery-button="animateNext") Animate next
+      button.action-button.prev.animate(gallery-button="animatePrev") Animate prev
+
   div.main-box-data
     h1.main-title Angular Cycle Gallery
     h2.main-title-description
-      | Made by&nbsp;
-      a(href="http://rademade.com") Rademade Co.
+      span Made by&nbsp;
+      a(href="http://rademade.com" target="_blank") Rademade Co.
 
     div.link-box-list
       div.link-box
