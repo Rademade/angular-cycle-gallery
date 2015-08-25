@@ -16,20 +16,15 @@ app.config([
       url: '',
       templateUrl: 'views/index.html'
 
-    .state 'example',
-      abstract: true,
-      url: '/',
-      templateUrl: 'layout/example.html'
-
-    .state 'example.animation',
+    .state 'public.animation',
       url: 'animation_example',
       templateUrl: 'views/animation.html'
 
-    .state 'example.simple',
+    .state 'public.simple',
       url: 'simple_example',
       templateUrl: 'views/simple.html'
 
-    .state 'example.fix',
+    .state 'public.fix',
       url: 'fix',
       templateUrl: 'views/fix.html'
 

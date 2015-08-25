@@ -1,4 +1,13 @@
 div.content-box(ng-controller="GalleryController")
+  div.gallery-wrapper-data
+    div.gallery-wrapper-box
+      div.gallery-wrapper-title
+        | Click next or previous
+        br
+        | for smooth animation
+      div.clear
+      a.gallery-wrapper-btn(ui-sref="public.simple") Simple example
+      a.gallery-wrapper-btn(href="https://github.com/Rademade/angular-cycle-gallery" target="_blank") View code example
   div.gallery-wrapper(
   cycle-gallery
   gallery-init="onGalleryInit"
