@@ -1,4 +1,6 @@
 div.content-box.fix(ng-controller="GalleryController")
+  div.gallery-wrapper-title
+    | Click next or previous
   div.gallery-wrapper(
   cycle-gallery
   gallery-init="onGalleryInit"
@@ -18,3 +20,5 @@ div.content-box.fix(ng-controller="GalleryController")
     h3() Current index {{baseIndex}}
     button(ng-click="toggleGallery()") Toggl gallery
     button(ng-click="add()") Add item
+    a.gallery-wrapper-btn(ui-sref="public.animation") Animation example
+    a.gallery-wrapper-btn(href="https://github.com/Rademade/angular-cycle-gallery" target="_blank") View code example
