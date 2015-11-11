@@ -1,7 +1,7 @@
 {
   "name": "angular-cycle-gallery",
   "description": "Angular cycle gallery - responsive, touch gallery with animation for AngularJS without shit",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "homepage": "https://github.com/Rademade/angular-cycle-gallery",
   "author": "Vladislav Melyanitskiy <co@rademade.com>",
   "repository": {
@@ -16,7 +16,7 @@
     "angular-ui-router": "~0.2.15"
   },
   "dependencies": {
-    "angular": "~1.2.12",
+    "angular": "~1.2.26",
     "gsap": "~1.16.0"
   }
 }
