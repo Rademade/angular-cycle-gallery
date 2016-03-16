@@ -11,7 +11,7 @@ AngularJS **responsive** gallery with loop items listing. Support:
 
 ## Installation guide
 
-1. Add bower component `bower angular-cycle-gallery --save`
+1. Add bower component `bower install angular-cycle-gallery --save`
 2. Add JS  file. Path `build/angular-cycle-gallery.min.js`
 3. Add `cycleGallery` dependency to application
 
@@ -26,9 +26,9 @@ AngularJS **responsive** gallery with loop items listing. Support:
 5. Add list object to scope
 
 		$scope.list = [
-			{content: 'First'}
+			{content: 'First'},
 			{content: 'Second'}
-		]
+		];
 
 6. Add styles to your application. [SASS example](https://github.com/Rademade/angular-cycle-gallery/blob/master/src/sass/import.sass)
 
