@@ -19,7 +19,7 @@ div.content-box(ng-controller="GalleryController")
     div.gallery-slider(cycle-gallery-holder)
       div.gallery-item(gallery-repeater="item in gallery" style="background-image: url({{item.sref}});")
         h1.gallery-item-text() {{item.text}}
-    i.gallery-overflow
+        i.gallery-overflow
 
     button.action-button.next(gallery-button="next") next
     button.action-button.prev(gallery-button="prev") prev

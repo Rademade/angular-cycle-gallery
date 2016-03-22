@@ -33,7 +33,7 @@ app.config([
     $locationProvider.html5Mode
       enabled: true
       requireBase: false
-      html5Mode: true
+      html5Mode: false
 
 ])
 
