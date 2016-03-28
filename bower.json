@@ -16,6 +16,7 @@
     "angular-ui-router": "~0.2.15"
   },
   "dependencies": {
-    "angular": "~1.2.26"
+    "angular": "~1.2.26",
+    "gsap": "~1.16.0"
   }
 }
