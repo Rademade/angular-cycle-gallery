@@ -1,6 +1,6 @@
 angular.module('cycleGallery').service 'GalleryMover', [
-  'Animation',
-  (Animation) ->
+  'animationService',
+  (animationService) ->
 
     # TODO Need to extract sub components. Like animation and animate block
 
@@ -127,7 +127,7 @@ angular.module('cycleGallery').service 'GalleryMover', [
           time : @_getAnimationTime()
           position : position
 
-        @_animation = new Animation().linear(params)
+        @_animation = animationService.linear(params)
 
       _onCompleteAnimation : ->
         @_clearAnimationTime()
