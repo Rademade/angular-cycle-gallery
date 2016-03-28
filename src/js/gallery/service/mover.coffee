@@ -123,26 +123,48 @@ angular.module('cycleGallery').service 'GalleryMover', [
       # Animation block
 
       _animate: (position = @_getPositionForNecessaryIndex()) ->
-        @_stopPreviusAnimation()
+        cancelAnimationFrame @rafId
 
         @el = @_holder.getElement()[0]
         @el.style.transition = 'linear'
-        @position = @_getPositionForNecessaryIndex() - parseInt(@el.style.left)
-        @dx = @position / Math.ceil(@animationTime / FRAME_ANIMATION_TIME)
+        @from = parseInt(@el.style.left)
+        @to = position
+
+        startDate = +new Date()
 
         animate = =>
-          setTimeout =>
-            if @start < @animationTime - FRAME_ANIMATION_TIME
-              @start += FRAME_ANIMATION_TIME
-              @_processAnimation()
-              @_checkFrameChange()
-              requestAnimationFrame(animate)
-            else
-              @start = 0
-              @dx = 0
-              @_onCompleteAnimation()
-          , FRAME_ANIMATION_TIME
-        requestAnimationFrame(animate)
+          currentTime = +new Date() - startDate
+          newPosition = @to + (@to - @from) * (currentTime - @animationTime) / @animationTime
+          if currentTime < @animationTime
+            @el.style.left = newPosition + 'px'
+            @rafId = requestAnimationFrame(animate)
+          else
+            @el.style.left = @position + 'px'
+            @_onCompleteAnimation()
+
+        @rafId = requestAnimationFrame(animate)
+
+        #@_stopPreviusAnimation()
+#
+        #@el = @_holder.getElement()[0]
+        #@el.style.transition = 'linear'
+        #@position = position - parseInt(@el.style.left)
+        #@dx = @position / Math.ceil(@animationTime / FRAME_ANIMATION_TIME)
+#
+        #startDate = +new Date()
+#
+        #animate = =>
+        #  if @start < @animationTime - FRAME_ANIMATION_TIME
+        #    @start += FRAME_ANIMATION_TIME
+        #    @_processAnimation()
+        #    @_checkFrameChange()
+        #    requestAnimationFrame(animate)
+        #  else
+        #    @start = 0
+        #    @dx = 0
+        #    @_onCompleteAnimation()
+#
+        #requestAnimationFrame(animate)
 
       _processAnimation : =>
         position = parseInt(@el.style.left) + @dx
