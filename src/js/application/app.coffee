@@ -51,7 +51,7 @@ app.controller 'GalleryController', ($scope) ->
     {text: 'Item 4', sref: 'http://www.mrwallpaper.com/wallpapers/summer-mountain-lake-1600x1200.jpg'}
     {text: 'Item 5', sref: 'http://wfiles.brothersoft.com/i/iceland_mountain_and_lake_37299-1600x1200.jpg'}
     {text: 'Item 6', sref: 'http://www.photography-match.com/views/images/gallery/Mountain_Mist_Alberta_Canada___1600x1200___ID_.jpg'}
-    {text: 'Item 7', sref: 'http://wfiles.brothersoft.com/a/alpine-mountain-austria_107989-1600x1200.jpg'}
+    {text: 'Item 7', sref: 'http://www.pcwalls.net/download/mountain_lake_wallpaper_7-1600x1200.jpg'}
     {text: 'Item 8', sref: 'http://www.wallpaper77.com/upload/DesktopWallpapers/cache/Top-of-Mountain-landscape-mountain-1600x1200.jpg'}
     {text: 'Item 9', sref: 'http://www.mrwallpaper.com/wallpapers/Mountain-scenery-1600x1200.jpg'}
   ]
