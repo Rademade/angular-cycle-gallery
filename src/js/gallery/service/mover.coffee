@@ -9,8 +9,9 @@ angular.module('cycleGallery').service 'GalleryMover', [
       ANIMATION_SIDE_NEXT: 1
       ANIMATION_SIDE_PREV: 2
 
-      constructor: (config, storage, renderer, holder) ->
+      FRAME_ANIMATION_TIME = 1000 / 60
 
+      constructor: (config, storage, renderer, holder) ->
         # Options
         @animationTime = config.animationTime
         @_storage = storage
@@ -24,6 +25,11 @@ angular.module('cycleGallery').service 'GalleryMover', [
         @_necessaryIndex = 0
         @_displayIndex = 0
 
+        @el = undefined
+        @timer = no
+        @start = 0
+        @dx = 0
+        @position = 0
 
       #
       # Public methods
@@ -117,15 +123,31 @@ angular.module('cycleGallery').service 'GalleryMover', [
 
       # Animation block
 
-      _animate: (position = @_getPositionForNecessaryIndex())->
+      _animate: (position = @_getPositionForNecessaryIndex()) ->
         @_stopPreviusAnimation()
-        # TODO make request animation frame animation. Remove dependencies
-        @_animation = TweenMax.to(@_holder.getElement(), @_getAnimationTime()/1000, {
-          left: position + 'px'
-          ease: Linear.easeNone
-          onUpdate: => @_checkFrameChange()
-          onComplete: => @_onCompleteAnimation()
-        })
+
+        @el = @_holder.getElement()[0]
+        @el.style.transition = 'linear'
+        @position = @_getPositionForNecessaryIndex() - parseInt(@el.style.left)
+        @dx = @position / Math.ceil(@animationTime / FRAME_ANIMATION_TIME)
+
+        animate = =>
+          setTimeout =>
+            if @start < @animationTime - FRAME_ANIMATION_TIME
+              @start += FRAME_ANIMATION_TIME
+              @_processAnimation()
+              @_checkFrameChange()
+              requestAnimationFrame(animate)
+            else
+              @start = 0
+              @dx = 0
+              @_onCompleteAnimation()
+          , FRAME_ANIMATION_TIME
+        requestAnimationFrame(animate)
+
+      _processAnimation : =>
+        position = parseInt(@el.style.left) + @dx
+        @el.style.left = position + 'px'
 
       _onCompleteAnimation: ->
         @_clearAnimationTime()
@@ -187,7 +209,7 @@ angular.module('cycleGallery').service 'GalleryMover', [
       getDisplayIndex: -> @_displayIndex
       getNecessaryIndex: -> @_necessaryIndex
 
-      _syncIndexes: -> 
+      _syncIndexes: ->
         @_necessaryIndex = @getTrueIndex()
         @_displayIndex = @getTrueIndex()
 
@@ -211,6 +233,5 @@ angular.module('cycleGallery').service 'GalleryMover', [
       _scopeApply: ->
         return unless @_$scope
         @_$scope.$apply() unless @_$scope.$$phase
-
 
 ]
