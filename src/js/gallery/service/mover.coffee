@@ -26,7 +26,6 @@ angular.module('cycleGallery').service 'GalleryMover', [
         @_displayIndex = 0
 
         @el = undefined
-        @timer = no
         @start = 0
         @dx = 0
         @position = 0
