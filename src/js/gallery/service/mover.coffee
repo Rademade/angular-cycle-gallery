@@ -1,6 +1,6 @@
 angular.module('cycleGallery').service 'GalleryMover', [
-
-  ->
+  'animationService',
+  (animationService) ->
 
     # TODO Need to extract sub components. Like animation and animate block
 
@@ -10,7 +10,6 @@ angular.module('cycleGallery').service 'GalleryMover', [
       ANIMATION_SIDE_PREV: 2
 
       constructor: (config, storage, renderer, holder) ->
-
         # Options
         @animationTime = config.animationTime
         @_storage = storage
@@ -24,65 +23,64 @@ angular.module('cycleGallery').service 'GalleryMover', [
         @_necessaryIndex = 0
         @_displayIndex = 0
 
-
       #
       # Public methods
       # @param config {animationTime}
       #
-      setScope: ($scope) ->
+      setScope : ($scope) ->
         @_$scope = $scope
 
-      render: (items = []) ->
+      render : (items = []) ->
         @_storage.setItems(items)
         @_renderer.render( @_storage.getNearestRange() )
         @_holder.update()
         @_syncIndexes()
         @_applyPositionForNecessaryIndex()
 
-      setIndex: (index) ->
+      setIndex : (index) ->
         return @_stopAnimationSide() if @_animation_side
         @_storage.setIndex(index)
         @_syncIndexes()
         @_stopPreviusAnimation()
         @_rerender()
 
-      next: ->
+      next : ->
         return @_stopAnimationSide() if @_animation_side
         @_storage.nextIndex()
         @_syncIndexes()
         @_rerender()
 
-      prev: ->
+      prev : ->
         return @_stopAnimationSide() if @_animation_side
         @_storage.prevIndex()
         @_syncIndexes()
         @_rerender()
 
-      animateNext: ->
+      animateNext : ->
         @_clearAnimationTime()
         @_storage.incNextBuffer()
         ++@_necessaryIndex
         @_animate()
 
-      animatePrev: ->
+      animatePrev : ->
         @_clearAnimationTime()
         @_storage.incPrevBuffer()
         --@_necessaryIndex
         @_animate()
 
-      getAnimationSide: ->
+      getAnimationSide : ->
         @_animation_side
 
-      updateSizes: ->
+      updateSizes : ->
         @_stopAnimationSide()
         @_holder.update()
         @_applyPositionForNecessaryIndex()
 
-      forceMove: (position) ->
+      forceMove : (position) ->
         @_holder.setPosition( @_getPositionForDisplayIndex() + position )
         @_detectPosition()
 
-      applyIndexDiff: (index_diff) ->
+      applyIndexDiff : (index_diff) ->
         @_storage.setIndexDiff( index_diff )
         @_storage.clearRangeBuffer()
         @_syncIndexes()
@@ -92,12 +90,11 @@ angular.module('cycleGallery').service 'GalleryMover', [
 
       # Animation kill
 
-      _stopPreviusAnimation: ->
-        @_animation.pause() if @_animation
-        @_animation.kill() if @_animation
+      _stopPreviusAnimation : ->
+        animationService.stop()
         @_animation = null
 
-      _stopAnimationSide: ->
+      _stopAnimationSide : ->
         @_stopPreviusAnimation()
         @_clearAnimationTime()
         @_animation_side = null
@@ -107,34 +104,38 @@ angular.module('cycleGallery').service 'GalleryMover', [
 
       # Animation time
 
-      _getAnimationTime: ->
+      _getAnimationTime : ->
         timestamp = (new Date()).getTime()
         @_animationStartTime = timestamp unless @_animationStartTime
         @animationTime - (timestamp - @_animationStartTime)
 
-      _clearAnimationTime: ->
+      _clearAnimationTime : ->
         @_animationStartTime = null
 
       # Animation block
 
-      _animate: (position = @_getPositionForNecessaryIndex())->
-        @_stopPreviusAnimation()
-        # TODO make request animation frame animation. Remove dependencies
-        @_animation = TweenMax.to(@_holder.getElement(), @_getAnimationTime()/1000, {
-          left: position + 'px'
-          ease: Linear.easeNone
-          onUpdate: => @_checkFrameChange()
-          onComplete: => @_onCompleteAnimation()
-        })
+      _animate: (position = @_getPositionForNecessaryIndex()) ->
+        element = @_holder.getElement()[0]
+        params =
+          element : element
+          left : position + 'px'
+          onUpdate : => @_checkFrameChange()
+          onComplete : => @_onCompleteAnimation()
+          from : parseInt(element.style.left)
+          to : position
+          time : @_getAnimationTime()
+          position : position
 
-      _onCompleteAnimation: ->
+        @_animation = animationService.linear(params)
+
+      _onCompleteAnimation : ->
         @_clearAnimationTime()
         @_detectPositionClear()
         @_storage.clearRangeBuffer()
         @_syncIndexes()
         @_rerender()
 
-      _detectPosition: ->
+      _detectPosition : ->
         @_holder.createPositionLock()
         position_diff = @_holder.getPositionLockDiff()
         return false unless Math.abs(position_diff) > 5
@@ -144,11 +145,11 @@ angular.module('cycleGallery').service 'GalleryMover', [
           @_animation_side = @ANIMATION_SIDE_PREV
         return true
 
-      _detectPositionClear: ->
+      _detectPositionClear : ->
         @_holder.clearPositionLock()
         @_animation_side = null
 
-      _checkFrameChange: ->
+      _checkFrameChange : ->
         return false unless @_detectPosition()
         return false if (animation_display_index = @_holder.getDisplayIndex()) == @getDisplayIndex()
 
@@ -178,20 +179,20 @@ angular.module('cycleGallery').service 'GalleryMover', [
 
       # Index and position calculation
 
-      _applyPositionForNecessaryIndex: -> @_holder.setPosition( @_getPositionForNecessaryIndex() )
+      _applyPositionForNecessaryIndex : -> @_holder.setPosition( @_getPositionForNecessaryIndex() )
 
-      _getPositionForDisplayIndex: -> @_holder.__calculatePositionForIndex( @getDisplayIndex() )
-      _getPositionForNecessaryIndex: -> @_holder.__calculatePositionForIndex( @getNecessaryIndex() )
+      _getPositionForDisplayIndex : -> @_holder.__calculatePositionForIndex( @getDisplayIndex() )
+      _getPositionForNecessaryIndex : -> @_holder.__calculatePositionForIndex( @getNecessaryIndex() )
 
-      getTrueIndex: -> @_storage.getCurrentIndexInRange()
-      getDisplayIndex: -> @_displayIndex
-      getNecessaryIndex: -> @_necessaryIndex
+      getTrueIndex : -> @_storage.getCurrentIndexInRange()
+      getDisplayIndex : -> @_displayIndex
+      getNecessaryIndex : -> @_necessaryIndex
 
-      _syncIndexes: -> 
+      _syncIndexes : ->
         @_necessaryIndex = @getTrueIndex()
         @_displayIndex = @getTrueIndex()
 
-      getUseableDiff: ->
+      getUseableDiff : ->
         position_diff = @_holder.getSlideDiff()
         is_half = Math.abs(position_diff) > @_holder.getItemWidth()/2
         position_diff += @_holder.getItemWidth() if is_half # Check for first part of slide
@@ -199,11 +200,11 @@ angular.module('cycleGallery').service 'GalleryMover', [
 
       # Render function
 
-      _animationRender: ->
+      _animationRender : ->
         @_renderer.render( @_storage.getNearestRange() )
         @_scopeApply()
 
-      _rerender: ->
+      _rerender : ->
         @_renderer.render( @_storage.getNearestRange() )
         @_applyPositionForNecessaryIndex()
         @_scopeApply()
@@ -211,6 +212,5 @@ angular.module('cycleGallery').service 'GalleryMover', [
       _scopeApply: ->
         return unless @_$scope
         @_$scope.$apply() unless @_$scope.$$phase
-
 
 ]
