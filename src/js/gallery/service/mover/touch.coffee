@@ -20,6 +20,7 @@ angular.module('cycleGallery').service 'MoverTouch', ->
     touchStart: (position) ->
       @_trigger = true
       @_mover._stopPreviusAnimation() # TODO fix name. Like a private function
+
       @_start_position = position - @_mover.getUseableDiff()
       @_setPosition(0)
       # Swipe start logick
@@ -91,5 +92,3 @@ angular.module('cycleGallery').service 'MoverTouch', ->
         @_mover.animateNext()
       else
         @_mover.animatePrev()
-        
-

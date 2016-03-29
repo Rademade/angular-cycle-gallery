@@ -91,8 +91,7 @@ angular.module('cycleGallery').service 'GalleryMover', [
       # Animation kill
 
       _stopPreviusAnimation : ->
-        @_animation.pause() if @_animation
-        @_animation.kill() if @_animation
+        animationService.stop()
         @_animation = null
 
       _stopAnimationSide : ->

@@ -44,4 +44,3 @@ angular.module('cycleGallery').service 'MoverHolder', ->
 
     clearPositionLock: ->
       @_position_lock = null
-

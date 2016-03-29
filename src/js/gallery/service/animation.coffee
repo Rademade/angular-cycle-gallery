@@ -32,3 +32,6 @@ angular.module('cycleGallery').service 'animationService', ->
         animateParams.onComplete()
 
     rafId = requestAnimationFrame(animate)
+
+  stop : ->
+    cancelAnimationFrame rafId
