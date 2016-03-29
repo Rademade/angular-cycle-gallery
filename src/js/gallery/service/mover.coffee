@@ -194,7 +194,7 @@ angular.module('cycleGallery').service 'GalleryMover', [
 
       getUseableDiff : ->
         position_diff = @_holder.getSlideDiff()
-        is_half = Math.abs(position_diff) > @_holder.getItemWidth()/2
+        is_half = Math.abs(position_diff) > @_holder.getItemWidth() / 2
         position_diff += @_holder.getItemWidth() if is_half # Check for first part of slide
         position_diff
 
