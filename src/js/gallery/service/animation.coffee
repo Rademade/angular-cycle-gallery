@@ -1,6 +1,6 @@
 angular.module('cycleGallery').service 'animationService', ->
 
-  DEFAULT_TIME = 300
+  DEFAULT_TIME = 250
   FRAME_ANIMATION_TIME = 1000 / 60
 
   rafId = undefined
@@ -22,14 +22,17 @@ angular.module('cycleGallery').service 'animationService', ->
     start = +new Date
 
     animate = () ->
+      time = animateParams.time
       currentTime = +new Date() - start
-      newPosition = animateParams.to + (animateParams.to - animateParams.from) * (currentTime - animateParams.time) / animateParams.time
-      if currentTime < animateParams.time
+      newPosition = animateParams.to + (animateParams.to - animateParams.from) * (currentTime - time) / time
+
+      if currentTime < time
         animateParams.element.style.left = newPosition + 'px'
         rafId = requestAnimationFrame(animate)
       else
         animateParams.element.style.left = animateParams.position + 'px'
         animateParams.onComplete()
+      animateParams.onUpdate()
 
     rafId = requestAnimationFrame(animate)
 
