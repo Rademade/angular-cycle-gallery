@@ -2,29 +2,17 @@ lock '3.2.1'
 
 set :application, 'AngularCycleGallery'
 
-set :deploy_to, "/var/www/angular-cycle-gallery"
-
 set :scm, :git
-set :repo_url, 'git@github.com:Rademade/angular-cycle-gallery.git'
-
-set :rvm_type, :system
-set :rvm_ruby_version, 'ruby-2.1.5@angular-cycle-gallery'
 
 set :linked_dirs, %w{bower_components node_modules}
 set :keep_releases, 2
-
-set :hipchat_token,         ENV['HIPCHAT_AUTH_TOKEN']
-set :hipchat_room_name,     '379396'
-set :hipchat_announce,      false
-set :hipchat_color,         'yellow'
-set :hipchat_success_color, 'green'
 
 namespace :deploy do
 
   task 'npm:install' do
     on roles(:web) do
       within release_path do
-        execute :npm, :install
+        execute :npm, :install, '--silent'
       end
     end
   end
