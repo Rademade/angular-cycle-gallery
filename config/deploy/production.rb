@@ -1,8 +1,8 @@
 set :rvm_type, :system
-set :rvm_ruby_version, 'ruby-2.1.5@angular-cycle-gallery'
+set :rvm_ruby_version, 'ruby-2.3.0@angular-cycle-gallery'
 
 set :repo_url, 'git@github.com:Rademade/angular-cycle-gallery.git'
 
-set :deploy_to, "/var/www/angular-cycle-gallery"
+set :deploy_to, "/home/angular-cycle-gallery/website-frontend"
 
-server 'rademade.com', user: 'deploy', roles: %w{web app}
+server 'angular-cycle-gallery.rademade.com', user: 'angular-cycle-gallery', roles: %w{web app}
