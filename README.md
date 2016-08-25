@@ -7,7 +7,9 @@ AngularJS **responsive** gallery with loop items listing. Support:
 - Animation for next and previous items 
 - Touch scrolling support. **Amazing!**
 
-#### Live demo -> [Try it now](http://angular-cycle-gallery.rademade.com)
+#### [Live demo](http://angular-cycle-gallery.rademade.com)
+
+#### [Check jsfiddle.net example](https://jsfiddle.net/08b8uonz/5/)
 
 ## Installation guide
 
