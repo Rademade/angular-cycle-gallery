@@ -45,15 +45,15 @@ app.controller 'GalleryController', ($scope) ->
   ]
 
   $scope.gallery = [
-    {text: 'Item 1', sref: 'http://wfiles.brothersoft.com/a/alpine-mountain-austria_107989-1600x1200.jpg'}
-    {text: 'Item 2', sref: 'http://wfiles.brothersoft.com/a/alpine-mountain-austria_107989-1600x1200.jpg'}
-    {text: 'Item 3', sref: 'http://www.jpegwallpapers.com/images/wallpapers/Mountain-466704.jpeg'}
-    {text: 'Item 4', sref: 'http://www.mrwallpaper.com/wallpapers/summer-mountain-lake-1600x1200.jpg'}
-    {text: 'Item 5', sref: 'http://wfiles.brothersoft.com/i/iceland_mountain_and_lake_37299-1600x1200.jpg'}
-    {text: 'Item 6', sref: 'http://www.photography-match.com/views/images/gallery/Mountain_Mist_Alberta_Canada___1600x1200___ID_.jpg'}
-    {text: 'Item 7', sref: 'http://www.pcwalls.net/download/mountain_lake_wallpaper_7-1600x1200.jpg'}
-    {text: 'Item 8', sref: 'http://www.wallpaper77.com/upload/DesktopWallpapers/cache/Top-of-Mountain-landscape-mountain-1600x1200.jpg'}
-    {text: 'Item 9', sref: 'http://www.mrwallpaper.com/wallpapers/Mountain-scenery-1600x1200.jpg'}
+    {text: 'Item 1', sref: 'https://images.wallpaperscraft.ru/image/pirs_prichal_more_sumerki_bereg_118549_1920x1080.jpg'}
+    {text: 'Item 2', sref: 'https://images.wallpaperscraft.ru/image/zvezdnoe_nebo_noch_derevya_nochnoj_pejzazh_118760_1920x1080.jpg'}
+    {text: 'Item 3', sref: 'https://images.wallpaperscraft.ru/image/derevo_tuman_priroda_krasivo_84257_1920x1080.jpg'}
+    {text: 'Item 4', sref: 'https://images.wallpaperscraft.ru/image/plyazh_tropiki_more_pesok_palmy_zakat_84729_1920x1080.jpg'}
+    {text: 'Item 5', sref: 'https://images.wallpaperscraft.ru/image/conzelman_road_zakat_povorot_doroga_more_93620_1920x1080.jpg'}
+    {text: 'Item 6', sref: 'https://images.wallpaperscraft.ru/image/more_bereg_skaly_podvodnyy_mir_rastitelnost_ryba_53966_1920x1080.jpg'}
+    {text: 'Item 7', sref: 'https://images.wallpaperscraft.ru/image/plyazh_tropiki_more_pesok_leto_84726_1920x1080.jpg'}
+    {text: 'Item 8', sref: 'https://images.wallpaperscraft.ru/image/gory_reka_sneg_zima_93245_1920x1080.jpg'}
+    {text: 'Item 9', sref: 'https://images.wallpaperscraft.ru/image/leto_priroda_doroga_listya_derevya_90616_1920x1080.jpg'}
   ]
 
   $scope.baseIndex = 5
