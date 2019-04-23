@@ -11,6 +11,7 @@ jobs:
       - run:
           name: Bundle Install
           command: bundle check || bundle install
+
       - run:
           name: Deploy if tests pass and branch is master
           command: bundle exec cap production deploy
