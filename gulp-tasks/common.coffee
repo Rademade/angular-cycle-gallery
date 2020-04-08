@@ -3,11 +3,6 @@ gulp              = require 'gulp'
 concat            = require 'gulp-concat'
 nodemon           = require 'gulp-nodemon'
 
-gulp.task 'default', gulp.series(
-  'build:development',
-  gulp.parallel 'watch', 'server'
-)
-
 gulp.task 'watch', ->
   gulp.watch "#{file_manager.source}/sass/**/*",            ['stylesheets']
   gulp.watch "#{file_manager.source}/js/application/**/*",  ['javascript:application']
@@ -28,3 +23,8 @@ gulp.task 'server', ->
     ]
   .on 'restart', ->
     console.log 'Express server restarted'
+
+gulp.task 'default', gulp.series(
+  'build:development',
+  gulp.parallel 'watch', 'server'
+)
