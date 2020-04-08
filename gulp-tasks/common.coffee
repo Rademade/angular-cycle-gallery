@@ -3,9 +3,10 @@ gulp              = require 'gulp'
 concat            = require 'gulp-concat'
 nodemon           = require 'gulp-nodemon'
 
-gulp.task 'default', ->
-  gulp.start ['build:development', 'watch', 'server'], ->
-    console.log('Run')
+gulp.task 'default', gulp.series(
+  'build:development',
+  gulp.parallel 'watch', 'server'
+)
 
 gulp.task 'watch', ->
   gulp.watch "#{file_manager.source}/sass/**/*",            ['stylesheets']
