@@ -9,7 +9,7 @@
     "del": "^1.1.1",
     "express": "^4.12.2",
     "gulp": "^3.8.10",
-    "gulp-sass": "^2.0.4",
+    "gulp-sass": "3.x",
     "gulp-batch": "^1.0.4",
     "gulp-coffee": "^2.2.0",
     "gulp-concat": "^2.5.2",
