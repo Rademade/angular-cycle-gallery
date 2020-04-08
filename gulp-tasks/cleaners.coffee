@@ -7,7 +7,7 @@ del 			  = require 'del'
 
 gulp.task 'clean:build', -> clean(file_manager.build)
 
-gulp.task 'clean', ['clean:build'], -> clean(file_manager.public)
+gulp.task 'clean', gulp.series('clean:build', -> clean(file_manager.public))
 
 clean = (dir)->
   del([dir])
