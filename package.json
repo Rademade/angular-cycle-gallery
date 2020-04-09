@@ -22,7 +22,6 @@
     "gulp-preprocess": "^1.2.0",
     "gulp-rename": "^1.2.0",
     "gulp-uglify": "^1.1.0",
-    "gulp-watch": "^3.0.0",
     "lodash": "^2.4.1",
     "q": "^1.1.2",
     "stream-series": "^0.1.1"
