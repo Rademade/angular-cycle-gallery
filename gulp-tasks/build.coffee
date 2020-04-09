@@ -4,7 +4,7 @@ gulp.task 'build:production', gulp.series(
   'clean:build',
   'javascript:build',
   'stylesheets:build',
-  -> console.log('Production build finished'),
+  (cb) -> console.log('Production build finished'); cb(),
 )
 
 gulp.task 'build:development', gulp.series(
@@ -13,5 +13,5 @@ gulp.task 'build:development', gulp.series(
   'stylesheets',
   'layout',
   'templates',
-  -> console.log('Development build finished'),
+  (cb) -> console.log('Development build finished'); cb(),
 )
