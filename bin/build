@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -eu
+
+set -a && source .env && set +a
+
+# app
+docker build --build-arg "REVISION=$(git rev-parse HEAD)" \
+    -t "$REGISTRY_URL/app:$BRANCH" \
+    -f "Dockerfile.$BRANCH" \
+    .
+
+# push
+docker push "$REGISTRY_URL/app:$BRANCH"
