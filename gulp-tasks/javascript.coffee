@@ -45,7 +45,7 @@ gulp.task 'javascript:build', gulp.series('javascript', ->
 ###
 
 collectJavaScript = (source, name, destination, opts = {}) ->
-  stream = gulp.src source
+  stream = gulp.src source, allowEmpty: true
   stream = stream.pipe plumber()
 
   stream = stream.pipe coffee(bare: no) if opts.coffee
