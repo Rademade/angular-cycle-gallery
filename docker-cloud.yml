@@ -1,0 +1,20 @@
+version: "3.5"
+
+services:
+  app:
+    image: $REGISTRY_HOST/$PROJECT_IMAGE/app:$PROJECT_TAG
+    networks:
+      - proxy
+    deploy:
+      labels:
+        - "traefik.port=80"
+        - "traefik.docker.network=proxy"
+        - "traefik.frontend.rule=Host:$VIRTUAL_HOST"
+        - "traefik.frontend.headers.SSLRedirect=true"
+      placement:
+        constraints:
+          - node.labels.role == $TARGET_NODE
+
+networks:
+  proxy:
+    external: true
