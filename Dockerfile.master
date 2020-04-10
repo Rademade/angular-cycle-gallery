@@ -1,0 +1,22 @@
+FROM node:12-alpine3.11
+
+# git > npm, bower
+# python > node-gyp > node-sass > gulp-sass
+RUN apk add --no-cache build-base git python \
+    && echo "{\"allow_root\": true}" >> /root/.bowerrc \
+    && npm install -g bower
+
+WORKDIR /app
+COPY package.json package-lock.json bower.json ./
+RUN npm install && bower install
+COPY . .
+RUN npx gulp build:development
+
+
+FROM nginx:1-alpine
+
+ARG REVISION
+
+COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=0 /app/public /docroot
+RUN echo "$REVISION" > REVISION

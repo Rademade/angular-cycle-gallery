@@ -1,13 +1,17 @@
 gulp              = require 'gulp'
 
-gulp.task 'build:production', ['clean:build'], ->
-  gulp.start ['javascript:build'], ->
-    gulp.start ['stylesheets:build'], ->
-      console.log('Production build finished')
+gulp.task 'build:production', gulp.series(
+  'clean:build',
+  'javascript:build',
+  'stylesheets:build',
+  (cb) -> console.log('Production build finished'); cb(),
+)
 
-gulp.task 'build:development', ['clean'], ->
-  gulp.start ['javascript'], ->
-    gulp.start ['stylesheets'], ->
-      gulp.start ['layout'], ->
-      gulp.start ['templates'], ->
-        console.log('Development build finished')
+gulp.task 'build:development', gulp.series(
+  'clean',
+  'javascript',
+  'stylesheets',
+  'layout',
+  'templates',
+  (cb) -> console.log('Development build finished'); cb(),
+)

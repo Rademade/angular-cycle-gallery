@@ -20,23 +20,24 @@ gulp.task 'javascript:library', ->
 gulp.task 'javascript:vendor', ->
   collectJavaScript manifests.vendor(), 'vendor.js', file_manager.public, coffee: no
 
-gulp.task 'javascript', [
+gulp.task 'javascript', gulp.series(
   'javascript:vendor',
   'javascript:application'
   'javascript:library',
-]
+)
 
 ###
   JavaScript build tasks
 ###
 
-gulp.task 'javascript:build', ['javascript'], ->
+gulp.task 'javascript:build', gulp.series('javascript', ->
   files = [
     "#{file_manager.public}/library.js"
   ]
 
   collectJavaScript(files, 'angular-cycle-gallery.js', file_manager.build, {coffee: no})
   collectJavaScript(files, 'angular-cycle-gallery.min.js', file_manager.build, {coffee: no, compress: yes})
+)
 
 
 ###
@@ -44,7 +45,7 @@ gulp.task 'javascript:build', ['javascript'], ->
 ###
 
 collectJavaScript = (source, name, destination, opts = {}) ->
-  stream = gulp.src source
+  stream = gulp.src source, allowEmpty: true
   stream = stream.pipe plumber()
 
   stream = stream.pipe coffee(bare: no) if opts.coffee
