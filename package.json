@@ -7,7 +7,7 @@
     "bower": "^1.3.12",
     "coffee-script": "^1.8.0",
     "del": "^1.1.1",
-    "express": "^4.12.2",
+    "express": "^4.17.3",
     "gulp": "4.x",
     "gulp-sass": "3.x",
     "gulp-batch": "^1.0.4",
